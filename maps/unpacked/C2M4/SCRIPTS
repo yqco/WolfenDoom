@@ -1,0 +1,358 @@
+#include "zcommon.acs"
+
+
+////////////////
+// OBJECTIVES //
+////////////////
+
+script "OBJECTIVES" OPEN
+{
+	//Set primary objectives
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,0,"MO_ICON_OPN");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,1,0,"MO_C2M4_P1");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,1,"MO_ICON_OPN");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,1,1,"MO_C2M4_P2");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,2,"MO_ICON_OPN");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,1,2,"MO_C2M4_P3");
+	//Set secondary objectives
+	ACS_NamedExecuteAlways("boaobjectivesset",0,1,3,"MO_C2M4_S1");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,3,"MO_ICON_OPN");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,1,3,"MO_C2M4_S2");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,3,"MO_ICON_OPN");
+}
+
+script 201 (void)
+{
+	//Prim Objective 1 solved
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,0,"MO_ICON_ACC");	
+	ACS_NamedExecuteAlways("boaobjectiveaccomplished",0,0,0,0);
+}
+
+script 202 (void)
+{
+	//Prim Objective 2 solved
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,1,"MO_ICON_ACC");	
+	ACS_NamedExecuteAlways("boaobjectiveaccomplished",0,0,0,0);
+}
+
+script 203 (void)
+{
+	//Prim Objective 2 solved
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,4,"MO_ICON_ACC");	
+	ACS_NamedExecuteAlways("boaobjectiveaccomplished",0,0,0,0);
+}
+
+
+script 1 (void)
+{
+		ACS_NamedExecuteAlways("BoADialogue",0,"MS_DARR1","MS_DARR0","DARRENMESSAGE30");
+		delay(5*35);
+}
+
+int bunker_elevator_pos=1;
+
+script 2 (void) //Elevator script
+{ 
+	if(bunker_elevator_pos==0)
+	{
+		floor_raisebyvalue(115, 10, 256);
+		bunker_elevator_pos=1;
+		delay(4*35);
+		terminate;
+	}
+	if(bunker_elevator_pos==1)
+	{
+		floor_lowerbyvalue(115, 10, 256);
+		bunker_elevator_pos=0;
+		delay(4*35);
+		terminate;
+	}
+}
+
+script 3 OPEN //Sea Splash
+{
+	thing_activate(122);
+	delay(random(35,105));
+	thing_activate(123);
+	delay(random(35,105));
+	restart;
+	
+}
+
+script 4 OPEN //Waggle
+{
+	Floor_Waggle(124, 256, 32, 0, 0);
+}
+
+script 5 (void)
+{
+		ACS_NamedExecuteAlways("BoADialogue",0,"MS_DARR1","MS_DARR0","DARRENMESSAGE32");
+		
+}
+
+script 6 (void)
+{
+		ACS_NamedExecuteAlways("BoADialogue",0,"MS_DARR1","MS_DARR0","DARRENMESSAGE33");
+		
+}
+
+script 7 (void)
+{
+		ACS_NamedExecuteAlways("BoADialogue",0,"MS_DARR1","MS_DARR0","DARRENMESSAGE34");
+		
+}
+
+script 8 (void)
+{
+		ACS_NamedExecuteAlways("BoADialogue",0,"MS_DARR1","MS_DARR0","DARRENMESSAGE35");
+		
+}
+
+int mission_done=0;
+
+script 9 (void) // The SS is here
+{
+		ACS_NamedExecuteAlways("BoADialogue",0,"MS_DARR1","MS_DARR0","DARRENMESSAGE36");
+		SpawnSpotFacingForced("SSGuard", 125, 0);
+		SpawnSpotFacingForced("SSMP40Guard", 126, 0);
+		SpawnSpotFacingForced("Doberman", 127, 0);
+		mission_done=1;
+		thing_move(128, 129, 0);
+		
+		//Prim Objective 3 solved
+		ACS_NamedExecuteAlways("boaobjectivesset",0,0,2,"MO_ICON_ACC");	
+		ACS_NamedExecuteAlways("boaobjectiveaccomplished",0,0,0,0);
+}
+
+script 10 (void) // Talk to Darren and Exit_Normal
+{
+	if(mission_done==1)
+	{
+		Exit_Normal(0);
+	}
+	if(mission_done==0)
+	{
+		ACS_NamedExecuteAlways("BoADialogue",0,"MS_DARR1","MS_DARR0","DARRENMESSAGE36");
+	}
+	
+}
+
+script 11 (void)
+{
+		ACS_NamedExecuteAlways("BoADialogue",0,"MS_DARR1","MS_DARR0","DARRENMESSAGE38");
+		
+}
+
+int plane_number=0;
+
+script 12 (int plane_id) //Plane Destruction Script - no need of smoke & explosion spawners anymore (ozy81))
+{
+		setactorpitch(plane_id, getactorpitch(plane_id)+random(-0.01,0.03)); //made the pitch more random - ozy81
+		setactorroll(plane_id, getactorroll(plane_id)+random(0.02,-0.04)); //made the pitch more random - ozy81
+		thing_activate(plane_id);
+		SetActorState(plane_id,"Boom",TRUE); //let's boom! - ozy81
+		
+		plane_number++;
+		
+		if(plane_number==3)
+		{
+			//Sec Objective 1 solved
+			ACS_NamedExecuteAlways("boaobjectivesset",0,0,3,"MO_ICON_ACC");	
+			ACS_NamedExecuteAlways("boaobjectiveaccomplished",0,0,0,0);
+		}
+}
+
+script 13 (void)
+{
+	   //Give a normal damage factor
+	   SetActorProperty(0, APROP_DamageFactor, 1.0);
+}
+
+/////////////////////////////
+//// TRUCK SEQUENCE /////////
+/////////////////////////////
+
+    // Is the truck sequence active?
+    bool truckSequenceActive;
+	
+
+	// This script should be activated by the player.
+    Script "TruckSequence" (int railMover, int truck)
+    {
+	   //Objective 1 accomplished
+	   ACS_Execute(201, 0, 0, 0, 0);	
+		
+       // Ensure player has a tid
+       if (!ActivatorTID())
+          Thing_ChangeTID(0, UniqueTID(-32768, 0));
+       int player = ActivatorTID();
+       
+       // Force player to use truck weapon
+       str weap = GetWeapon();
+       GiveInventory("NebelwerferTruck", 1);
+       SetWeapon("NebelwerferTruck");
+	   
+	   // Activate damaging truck actor
+	   Thing_activate(truck);
+	   
+	   //Give a weaker damage factor
+	   SetActorProperty(player, APROP_DamageFactor, 0.2);
+       
+       // Is the sequence already active on another player?
+       bool extraPlayer = false;
+       
+       // Activate the railMover
+       if (!truckSequenceActive)
+       {
+          Thing_Activate(railMover);
+          truckSequenceActive = true;
+		  
+		  // Start playing the movement sound
+			PlaySound(truck, "MOTOR_JEEP", CHAN_BODY, 1.0, true);
+       }
+       else // Sequence already active, this is an extra player
+          extraPlayer = true;
+       
+       // Variables
+       int tox, toy; // Truck x and y offsets, to eliminate most possible jitters
+       int ota, ta;  // Old truck angle, truck angle
+       int pa;       // Player angle, explanation below
+       
+       while (truckSequenceActive)
+       {
+          // Move truck along rail if this was the orignal activator of the sequence
+          if (!extraPlayer)
+          {
+             SetActivator(truck);
+             tox = GetActorVelX(railMover) - GetActorVelX(0);
+             toy = GetActorVelY(railMover) - GetActorVelY(0);
+             ota = GetActorAngle(0);
+             Warp(railMover, tox, toy, 0, 0, WARPF_ABSOLUTEOFFSET|WARPF_INTERPOLATE|WARPF_STOP|WARPF_NOCHECKPOSITION);
+             ChangeActorPitch(0, -GetActorPitch(railMover), true);
+             ta  = GetActorAngle(0);
+          }
+          
+          // Move player along rail
+          // Get player angle so we can restore it after the warp
+          // We do this instead of using WARPF_USECALLERANGLE so that
+          // the offsets don't get messed up when the truck rotates.
+          SetActivator(player);
+          pa = GetActorAngle(0);
+          Warp(truck, -20.0, 0, 60.0, 0, WARPF_COPYINTERPOLATION|WARPF_STOP|WARPF_NOCHECKPOSITION);
+          ChangeActorAngle(0, pa + (ta - ota), true);
+          
+          // Reduce player velocity to 0 (prevents movement bobbing during entire ride)
+          SetActorVelocity(0, 0, 0, 0, false, true);
+          
+          Delay(1);
+       }
+       
+       // Stop rail if this was the orignal activator of the sequence
+       if (!extraPlayer)
+          Thing_Deactivate(railMover);
+       
+       // Get player out of truck
+       SetActivator(player);
+       Warp(truck, -20.0, 120.0, 60.0, 0, WARPF_COPYINTERPOLATION|WARPF_STOP|WARPF_NOCHECKPOSITION);
+	   
+	   // Deactivate damaging truck actor
+	   Thing_deactivate(truck);
+       
+       // Give player their weapon back
+       SetWeapon(weap);
+       TakeInventory("NebelwerferTruck", 1);
+    }
+
+    Script "EndTruckSequence" (void)
+    {
+       // End truck sequence
+       truckSequenceActive = false;
+	   
+   
+	   //Raise city gates
+	   Floor_Raisebyvalue(81, 16, 128);
+	   
+	   //Move Darren
+	   Thing_move(89,90,1);
+	   
+		//Objective 2 accomplished
+	   ACS_Execute(202, 0, 0, 0, 0);	
+    }
+
+/////////////////////////////////
+////// Generic Map Scripts //////
+/////////////////////////////////
+
+script 401 ENTER
+{
+	GiveInventory("Luger9mm",1);
+	GiveInventory("9mmAmmo",8);
+	SetWeapon("Luger9mm");
+}
+
+script 402 OPEN { //Setup Map
+
+		//First message from Darren
+		ACS_NamedExecuteAlways("BoADialogue",0,"MS_DARR1","MS_DARR0","DARRENMESSAGE31");
+
+        //Plane Reflection
+        Sector_SetPlaneReflection(133, 20, 0);
+		Sector_SetPlaneReflection(134, 40, 0);
+		Sector_SetPlaneReflection(135, 60, 0);
+}
+
+script 403 OPEN { //Spark Spawner (id 42)
+	thing_activate(138);
+	delay(random(10,20));
+	thing_deactivate(138);
+	delay(random(35,350));
+	restart;
+}
+
+script 404 (int vent_id) { //Generic vent breaker script
+	SetLineBlocking(vent_id,BLOCK_NOTHING);
+}
+
+script 405 (int toilet_id) { //Generic Flush Sound WC
+	PlaySound(toilet_id,"toilet/flush",CHAN_BODY,1.0,0,0);
+}
+
+
+script 406 (int line_id) { //Generic Mirror Script
+	TranslucentLine(line_id,255);
+	GlassBreak(0);
+	SetLineTexture(line_id,SIDE_FRONT,TEXTURE_MIDDLE,"MIRR_W04");
+}
+
+script 407 OPEN { //Water Waggle & Plane Reflection
+	//Ceiling_Waggle(30,32,16,0,0);
+	//Sector_SetPlaneReflection(128,20,0);
+}
+
+script 408 (int light_tid) { //Generic Light Script
+	if(!GetActorProperty(light_tid,APROP_Dormant))
+		Thing_Deactivate(light_tid);
+	else
+		Thing_Activate(light_tid);
+	PlaySound(0,"SW_LIGHT");
+}
+
+script 409 (void) { //Generic Ladder Script
+    ThrustThingZ(0, 15, 0, 0);
+    ACS_NamedExecute("Laddersound", 0, 0, 0, 0);
+}
+
+script "Laddersound" (void)
+{
+    PlaySound (0, "world/ladder", CHAN_BODY, 0.71);
+    delay(15);
+}
+
+script 600 OPEN
+{
+	thing_activate(151);
+	delay(random(1,15));
+	thing_deactivate(151);
+	delay(random(1,15));
+	restart;
+}

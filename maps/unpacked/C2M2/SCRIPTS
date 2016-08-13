@@ -1,0 +1,15 @@
+#include "zcommon.acs"
+
+script 402 ENTER
+{
+	//Setup the player
+	GiveInventory("Luger9mm",1);
+	GiveInventory("9mmAmmo",24);
+	GiveInventory("TrenchShotgun",1);
+	GiveInventory("12GaugeAmmo",16);
+	GiveInventory("KnifeSilent",1);
+	SetWeapon("Luger9mm");
+	
+	//Map inits
+	Floor_Waggle(8,16,32,0,0);
+}

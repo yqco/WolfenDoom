@@ -1,0 +1,56 @@
+#include "zcommon.acs"
+
+script 1 OPEN
+{
+    Thing_Activate(15); //mxd. Activate street lights
+    
+    int camera_number = 1;
+    ChangeCamera(camera_number, 0, 0);
+    
+    while(camera_number++ < 4)
+    {        
+        Delay(100);
+        FadeTo(0, 0, 0, 1.0, 1.0);
+        Delay(35);
+        ChangeCamera(camera_number, 0, 0);
+        FadeTo(0, 0, 0, 0.0, 1.5);
+    }
+    
+    Thing_Activate(4); //mxd. Start final camera movement
+    
+    // Draw the background
+    SetHudSize(640, 480, false);
+    SetFont("MOVIEHUD");
+    HudMessage(s: "A"; HUDMSG_FADEINOUT, 2, CR_UNTRANSLATED, 320.0, 240.0, 9999.0, 0.0, 0.0);
+    
+    Delay(90);
+    
+    // Draw the logo
+    SetHudSize(800, 600, false);
+    SetFont("M_DOOMXL"); //mxd
+    AmbientSound("SEQ_PLANEATTACK", 30);
+    
+    /*T667. uncommented for now as I want the logo to be larger and centered
+	//mxd. Loop so the logo stays at the right spot even after changing resolution...
+    int curwidth = 0;
+    while(true)
+    {
+        int width = GetCVar("vid_defwidth");
+        if(curwidth != width)
+        {
+            //mxd. Calculate virtual hud width for 800x600 HudSize based on current screen resolution
+            int height = GetCVar("vid_defheight");
+            int hudwidth = (FixedMul(600.0, FixedDiv(width << 16, height << 16)) + 0.5) >> 16; //calculate classic width, do some rounding, convert to int
+	
+            //mxd. Calculate position at the right edge of visible HUD; .2 is there to align HudMessage to the right side of the screen.
+            int offset = ((hudwidth - (hudwidth - 800) / 2) << 16) - 120.2;
+        
+            HudMessage(s: "A"; HUDMSG_FADEINOUT, 1, CR_UNTRANSLATED, offset, 580.2, 9999.0, 5.0, 5.0); //mxd
+            curwidth = width;
+        }
+        
+        Delay(5);
+    }*/
+	delay(3*35);
+	HudMessage(s: "A"; HUDMSG_FADEINOUT, 1, CR_UNTRANSLATED, 400.0, 300.0, 9999.0, 5.0, 5.0); //mxd
+}

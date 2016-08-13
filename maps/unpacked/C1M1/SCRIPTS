@@ -1,0 +1,172 @@
+#include "zcommon.acs"
+
+script 101 ENTER
+{
+	GiveInventory("KnifeSilent",1);
+	SetWeapon("KnifeSilent");
+}
+
+script 100 OPEN //Setting up the map
+{
+	//Set primary objectives
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,0,"MO_ICON_OPN");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,1,0,"MO_C1M1_P1");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,1,"MO_ICON_OPN");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,1,1,"MO_C1M1_P2");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,2,"MO_ICON_OPN");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,1,2,"MO_C1M1_P3");
+	//Set secondary objectives
+	ACS_NamedExecuteAlways("boaobjectivesset",0,1,3,"MO_C1M1_S1");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,3,"MO_ICON_OPN");
+	
+	//Set Camera Textures
+	SetCameraToTexture(97, "ASTR_CVE", 90);
+
+	Thing_SetGoal(39,38,4,0);
+	Thing_SetGoal(43,42,0,0);
+	Thing_SetGoal(49,47,0,0);
+	//Thing_SetSpecial(1,0,0,0,0); //turn on always these lights, can't be triggered by players
+	//SetActorState(1,"Script2",0);
+	//Thing_SetSpecial(4,0,0,0,0); //turn off always these lights, can't be triggered by players
+	//SetActorState(4,"Script1",0);
+
+	//Darren briefs you
+	delay(3*35);
+	ACS_NamedExecuteAlways("BoADialogue",0,"MS_DARR1","MS_DARR0","DARRENMESSAGE01");
+}
+
+script 4 (void) //Soldier dropping Luger
+{
+	delay(10);
+	spawnspotforced("Luger9mm",37,0,0);
+}
+
+script 6 (void)	//Pick up the yellow key
+{
+	//Mark primary objective 1 [0] complete
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,0,"MO_ICON_ACC");
+	ACS_NamedExecuteAlways("boaobjectiveaccomplished",0,0,0,0);
+}
+
+script 7 (void)	//Enter the facility
+{
+	//Mark primary objective 2 [1] complete
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,1,"MO_ICON_ACC");
+	ACS_NamedExecuteAlways("boaobjectiveaccomplished",0,0,0,0);
+}
+
+script 8 (void)	//Kill Schabbs
+{
+	//Mark primary objective 2 [1] complete
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,2,"MO_ICON_ACC");
+	ACS_NamedExecuteAlways("boaobjectiveaccomplished",0,0,0,0);
+}
+
+/////////////////////////////////
+//// Generic Map Scripts ////////
+/////////////////////////////////
+
+script 3 (int line_id) //Generic Mirror Script
+{
+	TranslucentLine(line_id,255);
+	GlassBreak(0);
+	SetLineTexture(line_id,SIDE_FRONT,TEXTURE_MIDDLE,"MIRR_W04");
+}
+
+script 5 (int toilet_id) //Generic Flush Sound WC
+{
+	PlaySound(toilet_id,"toilet/flush",CHAN_BODY,1.0,0,0);
+}
+
+script 1 (int light_tid) //Generic Light Script
+{
+	if(!GetActorProperty(light_tid,APROP_Dormant))
+		Thing_Deactivate(light_tid);
+	else
+		Thing_Activate(light_tid);
+	//PlaySound(0,"SW_LIGHT");
+}
+
+//Explosion outside
+script 10 (void)
+{
+	thing_remove(71);
+	thing_deactivate(66);
+	delay(7);
+	thing_activate(66);
+	thingsound(62,"grenade/explode",120);
+	SpawnRocks(80, 3); //mxd
+	thing_activate(62);
+	delay(10);
+	thingsound(63,"grenade/explode",120);
+	SpawnRocks(80, 3); //mxd
+	thing_activate(63);
+	thing_activate(78); //mxd. Activate steam spawner
+	Floor_LowerInstant(65,0,25); //mxd. Was 200
+	thing_deactivate(66);
+	Floor_LowerInstant(64,0,21); //mxd. Was 168
+	delay(11);
+	thing_activate(66);
+	thingsound(61,"grenade/explode",120);
+	SpawnRocks(80, 3); //mxd
+	thing_activate(61);
+	delay(11);
+	thing_deactivate(66);
+}
+
+//mxd
+function void SpawnRocks(int spotid, int steps)
+{
+    for(int i = 0; i < steps; i++)
+    {
+        if(Random(0, 9) < 6)
+        {
+            int id = UniqueTID();
+            int scale = Random(0.3, 0.5);
+            SpawnProjectile(spotid + i, "FallingRock", random(15, 50), random(8, 12), random(3, 6), 1, id);
+            SetActorProperty(id, APROP_ScaleX, scale);
+            SetActorProperty(id, APROP_ScaleY, scale);
+        }
+    }
+}
+
+script 192 (void)
+{
+	SpawnSpotForced("ChestKey", 90, 0, 0);
+	Polyobj_RotateRight(150, 4, 64);
+}
+
+//////////////////////////////////////
+///// MESSAGE SCRIPTS FROM DARREN ////
+//////////////////////////////////////
+
+
+int message_finished;
+
+script 2 (void) //Akten taken, time to get out
+{
+	delay(2*35);
+	setmusic("HURRY");
+	thing_activate(33);
+	spawnspotfacing("MP40Guard",44,0);
+	spawnspotfacing("Rottweiler",45,0);
+	spawnspotfacing("RifleGuard",46,0);
+
+	//Darren message incoming
+	delay(3*35);
+	ACS_NamedExecuteAlways("BoADialogue",0,"MS_DARR1","MS_DARR0","DARRENMESSAGE02");
+}
+
+//Supply Chest Script
+Script 501 (int supplychestid)
+{
+	spawnspotfacing("RifleGuard",51,0);
+}
+
+//Hitler's Secret
+Script 300 (void)
+{
+//Spawn Elite//
+    SpawnSpotFacing("EliteFlamer", 87, 2);
+	
+} 

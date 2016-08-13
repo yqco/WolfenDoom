@@ -1,0 +1,1454 @@
+namespace = "ZDoom";
+include = "SCRIPT00";
+
+//////////////////////////////////////////////////////////////////////////////////////////////////
+///////////  JUKEBOX - BEGINNING /////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////
+
+conversation
+{
+	actor = "Dummy_Talk1";
+	page //The page block here marks the first page
+	{
+		name = "\cIJukebox";
+		dialog = "$JUKEBOXCONC01";
+		panel = "DLP_NIG1";
+		voice = "DLV_NIG1";
+
+		choice
+		{
+			text = "$JUKEBOXCONC02";
+			//yesmessage = "$GUTENBERGCONVO08";
+			nextpage = 1;
+			special = 80;
+			arg0 = 155;
+			arg2 = 8;
+			closedialog = true;
+		}
+		choice
+		{
+			text = "$JUKEBOXCONC03";
+			//yesmessage = "$GUTENBERGCONVO08";
+			nextpage = 1;
+			special = 80;
+			arg0 = 155;
+			arg2 = 0;
+			closedialog = true;
+		}
+		choice
+		{
+			text = "$JUKEBOXCONC04";
+			//yesmessage = "$GUTENBERGCONVO08";
+			nextpage = 1;
+			special = 80;
+			arg0 = 155;
+			arg2 = 1;
+			closedialog = true;
+		}
+		choice
+		{
+			text = "$JUKEBOXCONC05";
+			//yesmessage = "$GUTENBERGCONVO08";
+			nextpage = 1;
+			special = 80;
+			arg0 = 155;
+			arg2 = 2;
+			closedialog = true;
+		}
+		choice
+		{
+			text = "$JUKEBOXCONC06";
+			//yesmessage = "$GUTENBERGCONVO08";
+			nextpage = 1;
+			special = 80;
+			arg0 = 155;
+			arg2 = 3;
+			closedialog = true;
+		}
+		choice
+		{
+			text = "$JUKEBOXCONC07";
+			//yesmessage = "$GUTENBERGCONVO08";
+			nextpage = 1;
+			special = 80;
+			arg0 = 155;
+			arg2 = 4;
+			closedialog = true;
+		}
+		choice
+		{
+			text = "$JUKEBOXCONC08";
+			//yesmessage = "$GUTENBERGCONVO08";
+			nextpage = 1;
+			special = 80;
+			arg0 = 155;
+			arg2 = 5;
+			closedialog = true;
+		}
+		choice
+		{
+			text = "$JUKEBOXCONC09";
+			//yesmessage = "$GUTENBERGCONVO08";
+			nextpage = 1;
+			special = 80;
+			arg0 = 155;
+			arg2 = 6;
+			closedialog = true;
+		}
+		choice
+		{
+			text = "$JUKEBOXCONC10";
+			//yesmessage = "$GUTENBERGCONVO08";
+			nextpage = 1;
+			special = 80;
+			arg0 = 155;
+			arg2 = 7;
+			closedialog = true;
+		}
+	}
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////
+///////////  NES CONSOLE - BEGINNING /////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////
+
+conversation
+{
+	actor = "Dummy_Talk2";
+	page //The page block here marks the first page
+	{
+		name = "$PROTOTYPECONV01";
+		dialog = "$PROTOTYPECONV02";
+		panel = "DLP_NIG1";
+		voice = "DLP_NIG1";
+
+		choice
+		{
+			text = "$PROTOTYPECONV03";
+			nextpage = 1;
+			special = 80;
+			arg0 = 160;
+			arg2 = 51;
+			yesmessage = "$PROTOTYPECONV06";
+			nomessage = "$PROTOTYPECONV07";
+			displaycost = false; //Adds "for 20" after "Shotgun", showing the cost
+			cost
+			{
+				item = "Cartridge51";
+				amount = 1;
+			}
+			closedialog = true;
+		}
+		choice
+		{
+			text = "$PROTOTYPECONV04";
+			nextpage = 1;
+			special = 80;
+			arg0 = 160;
+			arg2 = 52;
+			yesmessage = "$PROTOTYPECONV06";
+			nomessage = "$PROTOTYPECONV07";
+			displaycost = false; //Adds "for 20" after "Shotgun", showing the cost
+			cost
+			{
+				item = "Cartridge52";
+				amount = 1;
+			}
+			closedialog = true;
+		}
+		choice
+		{
+			text = "$PROTOTYPECONV05";
+			nextpage = 1;
+			special = 80;
+			arg0 = 160;
+			arg2 = 53;
+			yesmessage = "$PROTOTYPECONV06";
+			nomessage = "$PROTOTYPECONV07";
+			displaycost = false; //Adds "for 20" after "Shotgun", showing the cost
+			cost
+			{
+				item = "Cartridge53";
+				amount = 1;
+			}
+			closedialog = true;
+		}
+	}
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////
+///////////  LT. LAZ ROJAS SHOP - BEGINNING //////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////
+
+conversation	// Shop Conversion before Astrostein is finished
+{
+	ID = 30; //mxd. Need this set up this way so we can toggle Miller's talkability using Thing_SetConversation...
+	//actor = "Clerk";
+	page //The page block here marks the second page
+	{
+		name = "$CLERKCONV01";
+		dialog = "$CLERKCONV04";
+		panel = "MS_BLAK1";
+		voice = "blackguy/greet";
+		choice
+		{
+			text = "$CLERKCONV14";
+			nextpage = 2;
+		}
+	}
+	page //This second page block counts as page 3
+	{
+		name = "$CLERKCONV01";
+		dialog = "$CLERKCONV05";
+		panel = "MS_BLAK1";
+		voice = "DLV_LAZ2";
+		choice
+		{
+			text = "$CLERKCONV06";
+			giveitem = "LeatherJacket";
+			yesmessage = "$CLERKCONV02";
+			nomessage = "$CLERKCONV03";
+			nextpage = 2; //Stay on this page
+			displaycost = false; //Adds "for 20" after "Shotgun", showing the cost
+			cost
+			{
+				item = "CoinItem";
+				amount = 80;
+			}
+		}
+		choice
+		{
+			text = "$CLERKCONV07";
+			giveitem = "FlakJacket";
+			yesmessage = "$CLERKCONV02";
+			nomessage = "$CLERKCONV03";
+			nextpage = 2;
+			displaycost = false;
+			cost
+			{
+				item = "CoinItem";
+				amount = 160;
+			}
+		}
+		choice
+		{
+			text = "$CLERKCONV08";
+			giveitem = "HeavyArmor";
+			yesmessage = "$CLERKCONV02";
+			nomessage = "$CLERKCONV03";
+			nextpage = 2;
+			displaycost = false;
+			cost
+			{
+				item = "CoinItem";
+				amount = 250;
+			}
+		}
+		choice
+		{
+			text = "$CLERKCONV09";
+			giveitem = "GrenadePickup";
+			yesmessage = "$CLERKCONV02";
+			nomessage = "$CLERKCONV03";
+			nextpage = 2;
+			displaycost = false;
+			cost
+			{
+				item = "CoinItem";
+				amount = 50;
+			}
+		}
+		choice
+		{
+			text = "$CLERKCONV10";
+			giveitem = "NazisBackpack";
+			yesmessage = "$CLERKCONV02";
+			nomessage = "$CLERKCONV03";
+			nextpage = 2;
+			displaycost = false;
+			cost
+			{
+				item = "CoinItem";
+				amount = 250;
+			}
+		}
+		choice
+		{
+			text = "$CLERKCONV11";
+			giveitem = "VitalitySerum";
+			yesmessage = "$CLERKCONV02";
+			nomessage = "$CLERKCONV03";
+			nextpage = 2;
+			displaycost = false;
+			cost
+			{
+				item = "CoinItem";
+				amount = 75;
+			}
+		}
+		choice
+		{
+			text = "$CLERKCONV12";
+			giveitem = "FieldKit";
+			yesmessage = "$CLERKCONV02";
+			nomessage = "$CLERKCONV03";
+			nextpage = 2;
+			displaycost = false;
+			cost
+			{
+				item = "CoinItem";
+				amount = 100;
+			}
+		}
+  choice
+		{
+			text = "$CLERKCONV13";
+			giveitem = "MineSweeper";
+			yesmessage = "$CLERKCONV02";
+			nomessage = "$CLERKCONV03";
+			nextpage = 2;
+			displaycost = false;
+			cost
+			{
+				item = "CoinItem";
+				amount = 100;
+			}
+		}
+  choice
+		{
+			text = "$CLERKCONV18";
+			giveitem = "Bandages";
+			yesmessage = "$CLERKCONV02";
+			nomessage = "$CLERKCONV03";
+			nextpage = 2;
+			displaycost = false;
+			cost
+			{
+				item = "CoinItem";
+				amount = 25;
+			}
+		}
+	}
+}
+
+conversation	// Shop Conversion after Astrostein is finished
+{
+	ID = 31; //mxd. Need this set up this way so we can toggle Miller's talkability using Thing_SetConversation...
+	//actor = "Clerk";
+	page //The page block here marks the first page
+	{
+		name = "$CLERKCONV01";
+		dialog = "$CLERKCONV16";
+		panel = "MS_BLAK1";
+		voice = "blackguy/greet";
+		choice
+		{
+			text = "$CLERKCONV17";
+			nextpage = 2;
+		}
+	}
+	page //This second page block counts as page 2
+	{
+		name = "$CLERKCONV01";
+		dialog = "$CLERKCONV05";
+		panel = "MS_BLAK1";
+		voice = "DLV_LAZ2";
+		choice
+		{
+			text = "$CLERKCONV06";
+			giveitem = "LeatherJacket";
+			yesmessage = "$CLERKCONV02";
+			nomessage = "$CLERKCONV03";
+			nextpage = 2; //Stay on this page
+			displaycost = false; //Adds "for 20" after "Shotgun", showing the cost
+			cost
+			{
+				item = "CoinItem";
+				amount = 80;
+			}
+		}
+		choice
+		{
+			text = "$CLERKCONV07";
+			giveitem = "FlakJacket";
+			yesmessage = "$CLERKCONV02";
+			nomessage = "$CLERKCONV03";
+			nextpage = 2;
+			displaycost = false;
+			cost
+			{
+				item = "CoinItem";
+				amount = 160;
+			}
+		}
+		choice
+		{
+			text = "$CLERKCONV08";
+			giveitem = "HeavyArmor";
+			yesmessage = "$CLERKCONV02";
+			nomessage = "$CLERKCONV03";
+			nextpage = 2;
+			displaycost = false;
+			cost
+			{
+				item = "CoinItem";
+				amount = 250;
+			}
+		}
+		choice
+		{
+			text = "$CLERKCONV09";
+			giveitem = "GrenadePickup";
+			yesmessage = "$CLERKCONV02";
+			nomessage = "$CLERKCONV03";
+			nextpage = 2;
+			displaycost = false;
+			cost
+			{
+				item = "CoinItem";
+				amount = 50;
+			}
+		}
+		choice
+		{
+			text = "$CLERKCONV10";
+			giveitem = "NazisBackpack";
+			yesmessage = "$CLERKCONV02";
+			nomessage = "$CLERKCONV03";
+			nextpage = 2;
+			displaycost = false;
+			cost
+			{
+				item = "CoinItem";
+				amount = 250;
+			}
+		}
+		choice
+		{
+			text = "$CLERKCONV11";
+			giveitem = "VitalitySerum";
+			yesmessage = "$CLERKCONV02";
+			nomessage = "$CLERKCONV03";
+			nextpage = 2;
+			displaycost = false;
+			cost
+			{
+				item = "CoinItem";
+				amount = 75;
+			}
+		}
+		choice
+		{
+			text = "$CLERKCONV12";
+			giveitem = "VitalitySerum";
+			yesmessage = "$CLERKCONV02";
+			nomessage = "$CLERKCONV03";
+			nextpage = 2;
+			displaycost = false;
+			cost
+			{
+				item = "CoinItem";
+				amount = 100;
+			}
+		}
+  choice
+		{
+			text = "$CLERKCONV13";
+			giveitem = "MineSweeper";
+			yesmessage = "$CLERKCONV02";
+			nomessage = "$CLERKCONV03";
+			nextpage = 2;
+			displaycost = false;
+			cost
+			{
+				item = "CoinItem";
+				amount = 100;
+			}
+		}
+	choice
+		{
+			text = "$CLERKCONV18";
+			giveitem = "Bandages";
+			yesmessage = "$CLERKCONV02";
+			nomessage = "$CLERKCONV03";
+			nextpage = 2;
+			displaycost = false;
+			cost
+			{
+				item = "CoinItem";
+				amount = 25;
+			}
+		}
+   choice  //SuperShield Object, make accessable as soon as Astrostein has been solved
+		{
+			text = "$CLERKCONV15";
+			giveitem = "SuperShieldSmall";
+			yesmessage = "$CLERKCONV02";
+			nomessage = "$CLERKCONV03";
+			nextpage = 2;
+			displaycost = false;
+			cost
+			{
+				item = "CoinItem";
+				amount = 150;
+			}
+		}
+	}
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////
+///////////  GENERAL JOHN H. MILLER - BEGINNING //////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////
+
+conversation
+{
+	//actor = "GeneralAllied";
+	ID = 3; //mxd. Need this set up this way so we can toggle Miller's talkability using Thing_SetConversation...
+	page //The page block here marks the first page
+	{
+		name = "$GENERALMCONV01";
+		dialog = "$GENERALMCONV02";
+		panel = "MS_GENR1";
+		voice = "miller/greet";
+
+		choice
+		{
+			text = "$GENERALMCONV03";
+			nextpage = 1;
+			special = 80;
+			arg0 = 101;
+			closedialog = true;
+		}
+	}
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////
+///////////  SGT. ASCHER - BEGINNING /////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////
+
+Conversation
+{
+	ID = 231;
+	page //The page block here marks the first page
+	{
+		name = "$ASCHERCONV01";
+		dialog = "$ASCHERCONV02";
+		panel = "MS_OFFC1";
+		voice = "allied2/greet";
+		
+	}
+}
+
+Conversation
+{
+	ID = 232;
+	page //The page block here marks the first page
+	{
+		name = "$ASCHERCONV01";
+		dialog = "$ASCHERCONV03";
+		panel = "MS_OFFC1";
+		voice = "allied2/greet";
+		
+	}
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////
+///////////  SGT. NASH - BEGINNING ///////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////
+
+conversation
+{
+	ID = 201;
+	page //The page block here marks the first page
+	{
+		name = "$MARINE1CONV01";
+		dialog = "$MARINE1CONV02";
+		panel = "MS_SOLD1";
+		voice = "allied2/greet";
+
+		choice
+		{
+			text = "$MARINE1CONV03";
+			nextpage = 3;
+		}
+
+		choice
+		{
+			text = "$MARINE1CONV04";
+			nextpage = 2;
+		}
+
+		choice
+		{
+			text = "$MARINE1CONV12";
+			nextpage = 4;
+		}
+	}
+	page //2
+	{
+		name = "$MARINE1CONV01";
+		dialog = "$MARINE1CONV06";
+		panel = "MS_SOLD1";
+		voice = "DLV_NIG1";
+
+		choice
+		{
+			text = "$MARINE1CONV08";
+			nextpage = 1;
+		}
+	}
+	page //3
+	{
+		name = "$MARINE1CONV01";
+		dialog = "$MARINE1CONV07";
+		panel = "MS_SOLD1";
+		voice = "DLV_NIG1";
+
+		choice
+		{
+			text = "$MARINE1CONV09";
+			nextpage = 1;
+		}
+	}
+	page //5
+	{
+		name = "$MARINE1CONV01";
+		dialog = "$MARINE1CONV13";
+		panel = "MS_SOLD1";
+		voice = "DLV_NIG1";
+
+		choice
+		{
+			text = "$MARINE1CONV11";
+			nextpage = 1;
+		}
+	}
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////
+///////////  PROF GUTENBERG DIALOGUES - BEGINNING ////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////
+
+conversation	//Gutenberg: Eisenmann is incomplete
+{
+	ID = 4;
+	page //The page block here marks the first page
+	{
+		name = "$GUTENBERGCONVO13";
+		dialog = "$GUTENBERGCONVO01";
+		panel = "MS_PROF1";
+		voice = "gutenberg/greet";
+		choice
+		{
+			text = "$GUTENBERGCONVO10";
+			nextpage = 2;
+		}
+		choice
+		{
+			text = "$GUTENBERGCONVO11";
+			nextpage = 3;
+		}
+		choice
+		{
+			text = "$GUTENBERGCONVO12";
+			yesmessage = "$GUTENBERGCONVO08";
+			nomessage = "$GUTENBERGCONVO09";
+			//nextpage = 1;
+			displaycost = false;
+			special = 80;
+			arg0 = 2;
+			arg2 = 1;
+			cost
+			{
+				item = "AktenEisenmann";
+				amount = 1;
+			}
+		}
+	}
+	page //2
+	{
+		name = "$GUTENBERGCONVO13";
+		dialog = "$GUTENBERGCONVO02";
+		panel = "MS_PROF1";
+		voice = "DLV_NIG1";
+		choice
+		{
+			text = "$GUTENBERGCONVO16";
+			nextpage = 1;
+		}
+	}
+	page //3
+	{
+		name = "$GUTENBERGCONVO13";
+		dialog = "$GUTENBERGCONVO03";
+		panel = "MS_PROF1";
+		voice = "DLV_NIG1";
+		choice
+		{
+			text = "$GUTENBERGCONVO14";
+			nextpage = 1;
+		}
+	}
+}
+conversation	//Gutenberg: Eisenmann is complete
+{
+	ID = 5;
+	page //The page block here marks the first page
+	{
+		name = "$GUTENBERGCONVO13";
+		dialog = "$GUTENBERGCONVO01";
+		panel = "MS_PROF1";
+		voice = "DLV_NIG1";
+		choice
+		{
+			text = "$GUTENBERGCONVO10";
+			nextpage = 2;
+		}
+		choice
+		{
+			text = "$GUTENBERGCONVO22";
+			nextpage = 3;
+		}
+	}
+	page //2
+	{
+		name = "$GUTENBERGCONVO13";
+		dialog = "$GUTENBERGCONVO02";
+		panel = "MS_PROF1";
+		voice = "DLV_NIG1";
+		choice
+		{
+			text = "$GUTENBERGCONVO16";
+			nextpage = 1;
+		}
+	}
+	page //3
+	{
+		name = "$GUTENBERGCONVO13";
+		dialog = "$GUTENBERGCONVO23";
+		panel = "MS_PROF1";
+		voice = "DLV_NIG1";
+		choice
+		{
+			text = "$GUTENBERGCONVO24";
+			nextpage = 1;
+		}
+	}
+}
+conversation	//Gutenberg: Eisenmann and Astrostein are both incomplete
+{
+	ID = 6;
+	page //The page block here marks the first page
+	{
+		name = "$GUTENBERGCONVO13";
+		dialog = "$GUTENBERGCONVO01";
+		panel = "MS_PROF1";
+		voice = "gutenberg/greet";
+		choice
+		{
+			text = "$GUTENBERGCONVO10";
+			nextpage = 2;
+		}
+		choice
+		{
+			text = "$GUTENBERGCONVO11";
+			nextpage = 3;
+		}
+		choice
+		{
+			text = "$GUTENBERGCONVO17";
+			nextpage = 4;
+		}
+		choice
+		{
+			text = "$GUTENBERGCONVO12";
+			yesmessage = "$GUTENBERGCONVO08";
+			nomessage = "$GUTENBERGCONVO09";
+			//nextpage = 1;
+			displaycost = false;
+			special = 80;
+			arg0 = 2;
+			arg2 = 1;
+			cost
+			{
+				item = "AktenEisenmann";
+				amount = 1;
+			}
+		}
+		choice
+		{
+			text = "$GUTENBERGCONVO15";
+			yesmessage = "$GUTENBERGCONVO08";
+			nomessage = "$GUTENBERGCONVO09";
+			//nextpage = 1;
+			displaycost = false;
+			special = 80;
+			arg0 = 2;
+			arg2 = 2;
+			cost
+			{
+				item = "ArtifactAstrostrein";
+				amount = 1;
+			}
+		}
+	}
+	page //2
+	{
+		name = "$GUTENBERGCONVO13";
+		dialog = "$GUTENBERGCONVO02";
+		panel = "MS_PROF1";
+		voice = "DLV_NIG1";
+		choice
+		{
+			text = "$GUTENBERGCONVO16";
+			nextpage = 1;
+		}
+	}
+	page //3
+	{
+		name = "$GUTENBERGCONVO13";
+		dialog = "$GUTENBERGCONVO03";
+		panel = "MS_PROF1";
+		voice = "DLV_NIG1";
+		choice
+		{
+			text = "$GUTENBERGCONVO14";
+			nextpage = 1;
+		}
+	}
+	page //4
+	{
+		name = "$GUTENBERGCONVO13";
+		dialog = "$GUTENBERGCONVO05";
+		panel = "MS_PROF1";
+		voice = "DLV_NIG1";
+		choice
+		{
+			text = "$GUTENBERGCONVO14";
+			nextpage = 1;
+		}
+	}
+}
+conversation	//Gutenberg: Eisenmann is complete, but Astrostein is incomplete
+{
+	ID = 7;
+	page //The page block here marks the first page
+	{
+		name = "$GUTENBERGCONVO13";
+		dialog = "$GUTENBERGCONVO01";
+		panel = "MS_PROF1";
+		voice = "gutenberg/greet";
+		choice
+		{
+			text = "$GUTENBERGCONVO10";
+			nextpage = 2;
+		}
+		choice
+		{
+			text = "$GUTENBERGCONVO22";
+			nextpage = 3;
+		}
+		choice
+		{
+			text = "$GUTENBERGCONVO17";
+			nextpage = 4;
+		}
+		choice
+		{
+			text = "$GUTENBERGCONVO12";
+			yesmessage = "$GUTENBERGCONVO08";
+			nomessage = "$GUTENBERGCONVO09";
+			//nextpage = 1;
+			displaycost = false;
+			special = 80;
+			arg0 = 2;
+			arg2 = 1;
+			cost
+			{
+				item = "AktenEisenmann";
+				amount = 1;
+			}
+		}
+		choice
+		{
+			text = "$GUTENBERGCONVO15";
+			yesmessage = "$GUTENBERGCONVO08";
+			nomessage = "$GUTENBERGCONVO09";
+			//nextpage = 1;
+			displaycost = false;
+			special = 80;
+			arg0 = 2;
+			arg2 = 2;
+			cost
+			{
+				item = "ArtifactAstrostrein";
+				amount = 1;
+			}
+		}
+	}
+	page //2
+	{
+		name = "$GUTENBERGCONVO13";
+		dialog = "$GUTENBERGCONVO02";
+		panel = "MS_PROF1";
+		voice = "DLV_NIG1";
+		choice
+		{
+			text = "$GUTENBERGCONVO16";
+			nextpage = 1;
+		}
+	}
+	page //3
+	{
+		name = "$GUTENBERGCONVO13";
+		dialog = "$GUTENBERGCONVO23";
+		panel = "MS_PROF1";
+		voice = "DLV_NIG1";
+		choice
+		{
+			text = "$GUTENBERGCONVO24";
+			nextpage = 1;
+		}
+	}
+	page //4
+	{
+		name = "$GUTENBERGCONVO13";
+		dialog = "$GUTENBERGCONVO05";
+		panel = "MS_PROF1";
+		voice = "DLV_NIG1";
+		choice
+		{
+			text = "$GUTENBERGCONVO14";
+			nextpage = 1;
+		}
+	}
+}
+conversation	//Gutenberg: Eisenmann is incomplete, but Astrostein is complete
+{
+	ID = 8;
+	page //The page block here marks the first page
+	{
+		name = "$GUTENBERGCONVO13";
+		dialog = "$GUTENBERGCONVO01";
+		panel = "MS_PROF1";
+		voice = "gutenberg/greet";
+		choice
+		{
+			text = "$GUTENBERGCONVO10";
+			nextpage = 2;
+		}
+		choice
+		{
+			text = "$GUTENBERGCONVO11";
+			nextpage = 3;
+		}
+		choice
+		{
+			text = "$GUTENBERGCONVO25";
+			nextpage = 4;
+		}
+		choice
+		{
+			text = "$GUTENBERGCONVO12";
+			yesmessage = "$GUTENBERGCONVO08";
+			nomessage = "$GUTENBERGCONVO09";
+			//nextpage = 1;
+			displaycost = false;
+			special = 80;
+			arg0 = 2;
+			arg2 = 1;
+			cost
+			{
+				item = "AktenEisenmann";
+				amount = 1;
+			}
+		}
+		choice
+		{
+			text = "$GUTENBERGCONVO15";
+			yesmessage = "$GUTENBERGCONVO08";
+			nomessage = "$GUTENBERGCONVO09";
+			//nextpage = 1;
+			displaycost = false;
+			special = 80;
+			arg0 = 2;
+			arg2 = 2;
+			cost
+			{
+				item = "ArtifactAstrostrein";
+				amount = 1;
+			}
+		}
+	}
+	page //2
+	{
+		name = "$GUTENBERGCONVO13";
+		dialog = "$GUTENBERGCONVO02";
+		panel = "MS_PROF1";
+		voice = "DLV_NIG1";
+		choice
+		{
+			text = "$GUTENBERGCONVO16";
+			nextpage = 1;
+		}
+	}
+	page //3
+	{
+		name = "$GUTENBERGCONVO13";
+		dialog = "$GUTENBERGCONVO03";
+		panel = "MS_PROF1";
+		voice = "DLV_NIG1";
+
+		choice
+		{
+			text = "$GUTENBERGCONVO14";
+			nextpage = 1;
+		}
+	}
+	page //4
+	{
+		name = "$GUTENBERGCONVO13";
+		dialog = "$GUTENBERGCONVO26";
+		panel = "MS_PROF1";
+		voice = "DLV_NIG1";
+		choice
+		{
+			text = "$GUTENBERGCONVO27";
+			nextpage = 1;
+		}
+	}
+}
+conversation	//Gutenberg: Eisenmann and Astrostein are both complete
+{
+	ID = 9;
+	page //The page block here marks the first page
+	{
+		name = "$GUTENBERGCONVO13";
+		dialog = "$GUTENBERGCONVO01";
+		panel = "MS_PROF1";
+		voice = "gutenberg/greet";
+		choice
+		{
+			text = "$GUTENBERGCONVO10";
+			nextpage = 2;
+		}
+		choice
+		{
+			text = "$GUTENBERGCONVO22";
+			nextpage = 3;
+		}
+		choice
+		{
+			text = "$GUTENBERGCONVO25";
+			nextpage = 4;
+		}
+		choice
+		{
+			text = "$GUTENBERGCONVO12";
+			yesmessage = "$GUTENBERGCONVO08";
+			nomessage = "$GUTENBERGCONVO09";
+			//nextpage = 1;
+			displaycost = false;
+			special = 80;
+			arg0 = 2;
+			arg2 = 1;
+			cost
+			{
+				item = "AktenEisenmann";
+				amount = 1;
+			}
+		}
+		choice
+		{
+			text = "$GUTENBERGCONVO15";
+			yesmessage = "$GUTENBERGCONVO08";
+			nomessage = "$GUTENBERGCONVO09";
+			//nextpage = 1;
+			displaycost = false;
+			special = 80;
+			arg0 = 2;
+			arg2 = 2;
+			cost
+			{
+				item = "ArtifactAstrostrein";
+				amount = 1;
+			}
+		}
+	}
+	page //2
+	{
+		name = "$GUTENBERGCONVO13";
+		dialog = "$GUTENBERGCONVO02";
+		panel = "MS_PROF1";
+		voice = "DLV_NIG1";
+		choice
+		{
+			text = "$GUTENBERGCONVO16";
+			nextpage = 1;
+		}
+	}
+	page //3
+	{
+		name = "$GUTENBERGCONVO13";
+		dialog = "$GUTENBERGCONVO23";
+		panel = "MS_PROF1";
+		voice = "DLV_NIG1";
+		choice
+		{
+			text = "$GUTENBERGCONVO24";
+			nextpage = 1;
+		}
+	}
+	page //4
+	{
+		name = "$GUTENBERGCONVO26";
+		dialog = "$GUTENBERGCONVO27";
+		panel = "MS_PROF1";
+		voice = "DLV_NIG1";
+		choice
+		{
+			text = "$GUTENBERGCONVO14";
+			nextpage = 1;
+		}
+	}
+}
+conversation	//Gutenberg won't talk once a mission begins
+{
+	ID = 10;	//New dialogue after mission briefing
+	page //The page block here marks the first page
+	{
+		name = "$GUTENBERGCONVO13";
+		dialog = "$GUTENBERGCONVO07";
+		panel = "MS_PROF1";
+		voice = "DLV_NIG1";
+	}
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////
+///////////  LT. PADDOCK - BEGINNING /////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////
+
+conversation
+{
+	actor = "Marine_Talk2";
+	page //The page block here marks the first page
+	{
+		name = "$MARINE2CONV01";
+		dialog = "$MARINE2CONV02";
+		panel = "MS_SOLD1";
+		voice = "allied1/greet";
+
+		choice
+		{
+			text = "$MARINE2CONV04";
+			nextpage = 2;
+		}
+	}
+	page //2
+	{
+		name = "$MARINE2CONV01";
+		dialog = "$MARINE2CONV03";
+		panel = "MS_SOLD1";
+		voice = "DLV_NIG1";
+
+		choice
+		{
+			text = "$MARINE2CONV05";
+			nextpage = 3;
+		}
+	}
+	page //The page block here marks the third page
+	{
+		name = "$MARINE2CONV01";
+		dialog = "$MARINE2CONV06";
+		panel = "MS_SOLD1";
+		voice = "allied1/greet";
+	}
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////
+///////////  CPT. JAMES RYAN - BEGINNING /////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////
+
+conversation
+{
+	actor = "PrisonerAgentTalk";
+	page //The page block here marks the first page
+	{
+		name = "$PRISONERAGENTCONV01";
+		dialog = "$PRISONERAGENTCONV12";
+		panel = "MS_PRIS1";
+		voice = "DLV_NIG1";
+
+		choice
+		{
+			text = "$PRISONERAGENTCONV13";
+			nextpage = 2;
+		}
+	}
+	page //The page block here marks the first page
+	{
+		name = "$PRISONERAGENTCONV01";
+		dialog = "$PRISONERAGENTCONV02";
+		panel = "MS_PRIS1";
+		voice = "DLV_NIG1";
+
+		choice
+		{
+			text = "$PRISONERAGENTCONV03";
+			nextpage = 3;
+		}
+		choice
+		{
+			text = "$PRISONERAGENTCONV04";
+			nextpage = 4;
+		}
+		choice
+		{
+			text = "$PRISONERAGENTCONV05";
+			nextpage = 5;
+		}
+		choice
+		{
+			text = "$PRISONERAGENTCONV06";
+			nextpage = 6;
+		}
+	}
+	page //page 3
+	{
+		name = "$PRISONERAGENTCONV01";
+		dialog = "$PRISONERAGENTCONV07";
+		panel = "MS_PRIS1";
+		voice = "DLV_NIG1";
+		choice
+		{
+			text = "$PRISONERAGENTCONV08";
+			nextpage = 2;
+		}
+	}
+	page //page 4
+	{
+		name = "$PRISONERAGENTCONV01";
+		dialog = "$PRISONERAGENTCONV09";
+		panel = "MS_PRIS1";
+		voice = "DLV_NIG1";
+		choice
+		{
+			text = "$PRISONERAGENTCONV08";
+			nextpage = 2;
+		}
+	}
+	page //page 5
+	{
+		name = "$PRISONERAGENTCONV01";
+		dialog = "$PRISONERAGENTCONV10";
+		panel = "MS_PRIS1";
+		voice = "DLV_NIG1";
+		choice
+		{
+			text = "$PRISONERAGENTCONV08";
+			nextpage = 2;
+		}
+	}
+	page //page 6
+	{
+		name = "$PRISONERAGENTCONV01";
+		dialog = "$PRISONERAGENTCONV11";
+		panel = "MS_PRIS1";
+		voice = "DLV_NIG1";
+		choice
+		{
+			text = "$PRISONERAGENTCONV08";
+			nextpage = 2;
+		}
+	}
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////
+///////////  TOILET OF MIRACLES - BEGINNING //////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////
+
+conversation
+{
+	actor = "ToiletTalking";
+	page //The page block here marks the first page
+	{
+		name = "$TALKINGTOILETCONV01";
+		dialog = "$TALKINGTOILETCONV02";
+		panel = "DLP_NIG1";
+		voice = "DLV_NIG1";
+
+		choice
+		{
+			text = "$TALKINGTOILETCONV03";
+			nextpage = 2;
+		}
+	}
+	page //2
+	{
+		name = "$TALKINGTOILETCONV01";
+		dialog = "$TALKINGTOILETCONV04";
+		panel = "DLP_NIG1";
+		voice = "DLV_NIG1";
+
+		choice
+		{
+			text = "$TALKINGTOILETCONV05";
+			nextpage = 3;
+		}
+	}
+	page //The page block here marks the first page
+	{
+		name = "$TALKINGTOILETCONV01";
+		dialog = "$TALKINGTOILETCONV06";
+		panel = "DLP_NIG1";
+		voice = "toilet/flush";
+
+		choice
+		{
+			text = "$TALKINGTOILETCONV07";
+			nextpage = 4;
+		}
+	}
+	page //4
+	{
+		name = "$TALKINGTOILETCONV07";
+		dialog = "$TALKINGTOILETCONV15";
+		panel = "DLP_NIG1";
+		voice = "toilet/flush";
+
+		choice
+		{
+			text = "$TALKINGTOILETCONV12";
+			nextpage = 5;
+		}
+		choice
+		{
+			text = "$TALKINGTOILETCONV13";
+			nextpage = 6;
+		}
+		choice
+		{
+			text = "$TALKINGTOILETCONV14";
+			nextpage = 7;
+		}
+	}
+	page //5
+	{
+		name = "$TALKINGTOILETCONV07";
+		dialog = "$TALKINGTOILETCONV08";
+		panel = "DLP_NIG1";
+		voice = "toilet/flush";
+
+		choice
+		{
+			text = "$TALKINGTOILETCONV10";
+			nextpage = 4;
+		}
+	}
+	page //6
+	{
+		name = "$TALKINGTOILETCONV07";
+		dialog = "$TALKINGTOILETCONV09";
+		panel = "DLP_NIG1";
+		voice = "toilet/flush";
+
+		choice
+		{
+			text = "$TALKINGTOILETCONV10";
+			nextpage = 4;
+		}
+	}
+	page //7
+	{
+		name = "$TALKINGTOILETCONV07";
+		dialog = "$TALKINGTOILETCONV11";
+		panel = "DLP_NIG1";
+		voice = "toilet/flush";
+
+		choice
+		{
+			text = "$TALKINGTOILETCONV10";
+			nextpage = 4;
+		}
+	}
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////
+///////////  LT. TY HALDERMANN - BEGINNING ///////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////
+
+conversation
+{
+	actor = "StatistMedic";
+	page //The page block here marks the first page
+	{
+		name = "$MEDICCONV01";
+		dialog = "$MEDICCONV05";
+		panel = "MS_MEDC1";
+		voice = "allied3/greet";
+
+		choice
+		{
+			text = "$MEDICCONV06";
+			nextpage = 2;
+		}
+	}
+	page //The page block here marks the second page
+	{
+		name = "$MEDICCONV01";
+		dialog = "$MEDICCONV02";
+		panel = "MS_MEDC1";
+		voice = "allied3/greet";
+
+		choice
+		{
+			text = "$MEDICCONV03";
+			nextpage = 2;
+			giveitem = "Medikit_Fullhealth";
+			yesmessage = "$MEDICCONV04";
+			closedialog = true;
+		}
+	}
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////
+///////////  JULIETTE SHOTGLASS - BEGINNING //////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////
+
+conversation
+{
+	ID = 94;
+	actor = "StatistBarkeeper";
+	page //The page block here marks the first page
+	{
+		name = "$BARKEEPERCONV01";
+		dialog = "$BARKEEPERCONV02";
+		panel = "MS_BARK0";
+		voice = "DLV_NIG1";
+	}
+}
+
+conversation
+{
+	ID = 95;
+	page //The page block here marks the first page
+	{
+		name = "$BARKEEPERCONV01";
+		dialog = "$BARKEEPERCONV03";
+		panel = "MS_BARK0";
+		voice = "DLV_NIG1";
+	}
+}
+
+conversation
+{
+	ID = 96;
+	page //The page block here marks the first page
+	{
+		name = "$BARKEEPERCONV01";
+		dialog = "$BARKEEPERCONV04";
+		panel = "MS_BARK0";
+		voice = "DLV_NIG1";
+	}
+}

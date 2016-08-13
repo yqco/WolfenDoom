@@ -1,0 +1,73 @@
+#include "zcommon.acs"
+
+script 1 OPEN //start message
+{
+delay (const:35);
+SetHudSize (1024,768,0);
+SetFont ("dbigfont");
+HudMessageBold (s:"WELCOME TO THE TEST MAP, CHEATER!\n\nLIGHTS AND MODELS INSIDE!";HUDMSG_TYPEON,0,CR_UNTRANSLATED,512.4,128.0,3.0);
+delay (35*5);
+}
+
+script 2 OPEN
+{
+Thing_Activate(5);
+Thing_Deactivate(6);
+Thing_Deactivate(7); //AstroStuff
+Thing_Deactivate(8); //Stuff
+Thing_Deactivate(9); //NaziStuff
+Thing_Deactivate(10); //NaziBosses
+}
+
+script "Stuff" (VOID)
+{
+Thing_Activate(8); //Stuff
+delay (const:35);
+SetHudSize (1024,768,0);
+SetFont ("dbigfont");
+HudMessageBold (s:"STUFF";HUDMSG_TYPEON,0,CR_UNTRANSLATED,512.4,128.0,3.0);
+}
+
+script "3DStuff" (VOID)
+{
+delay (const:35);
+SetHudSize (1024,768,0);
+SetFont ("dbigfont");
+HudMessageBold (s:"3D STUFF";HUDMSG_TYPEON,0,CR_UNTRANSLATED,512.4,128.0,3.0);
+}
+
+script "NaziStuff" (VOID)
+{
+Thing_Activate(9); //NaziStuff
+delay (const:35);
+SetHudSize (1024,768,0);
+SetFont ("dbigfont");
+HudMessageBold (s:"NAZI STUFF";HUDMSG_TYPEON,0,CR_UNTRANSLATED,512.4,128.0,3.0);
+}
+
+script "NaziBosses" (VOID)
+{
+Thing_Activate(10); //NaziBosses
+delay (const:35);
+SetHudSize (1024,768,0);
+SetFont ("dbigfont");
+HudMessageBold (s:"NAZI BOSSES";HUDMSG_TYPEON,0,CR_UNTRANSLATED,512.4,128.0,3.0);
+}
+
+script "AstroStuff" (VOID)
+{
+Thing_Activate(7); //AstroStuff
+delay (const:35);
+SetHudSize (1024,768,0);
+SetFont ("dbigfont");
+HudMessageBold (s:"ASTROSTEIN STUFF";HUDMSG_TYPEON,0,CR_UNTRANSLATED,512.4,128.0,3.0);
+}
+
+script 408 (int light_tid)
+{
+	if(!GetActorProperty(light_tid, APROP_Dormant))
+		Thing_Deactivate(light_tid);
+	else
+		Thing_Activate(light_tid);
+	PlaySound(0, "SW_LIGHT");
+}

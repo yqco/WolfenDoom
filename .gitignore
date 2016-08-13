@@ -1,8 +1,7 @@
 *.tmp
 *.dbs
-*.backup1
-*.backup2
-*.backup3
+*.wad*
 *.bak
 *.php
 *.psd
+timestamp

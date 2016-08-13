@@ -1,0 +1,161 @@
+#include "zcommon.acs"
+#import "source/stealth.acs" //mxd
+
+script 1 ENTER
+{
+    //mxd. Stealth system usage
+    VisibilityMultiplier = 0.0; // Make the player less visible
+    NoiseLevelMultiplier = 1.0; // And slightly less hearable
+    ShowStealthHUD = true; // Show the HUD
+    PlayerDetectionVisibility = 100;
+}
+
+script 2 (void) //Put on your fancy dress
+{
+    ACS_NamedExecute("CLEAR INVENTORY", 0);
+}
+
+script "Kennkarte" (void) //Check for Kennkarte
+{
+		if(checkinventory("Kennkarte")==1)
+		{
+			SetLineBlocking(178, BLOCK_NOTHING);
+		}
+		else
+		{
+			SetLineBlocking(178, BLOCK_PLAYERS);
+			ACS_NamedExecuteAlways("BoADialogue",0,"MS_DARR1","MS_DARR0","DARRENMESSAGE29");
+		}
+}
+
+script 3 OPEN
+{
+	//Darren message incoming
+	delay(2*35);
+	ACS_NamedExecuteAlways("BoADialogue",0,"MS_DARR1","MS_DARR0","DARRENMESSAGE42");
+	delay(15*35);
+	ACS_NamedExecuteAlways("BoADialogue",0,"MS_DARR1","MS_DARR0","DARRENMESSAGE43");
+	delay(15*35);
+	ACS_NamedExecuteAlways("BoADialogue",0,"MS_DARR1","MS_DARR0","DARRENMESSAGE44");
+}
+
+////////////////
+// OBJECTIVES //
+////////////////
+
+script "OBJECTIVES" OPEN
+{
+	//Set primary objectives
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,0,"MO_ICON_OPN");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,1,0,"MO_C2M6B_P1");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,1,"MO_ICON_OPN");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,1,1,"MO_C2M6B_P2");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,2,"MO_ICON_OPN");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,1,2,"MO_C2M6B_P3");
+	//Set secondary objectives
+	ACS_NamedExecuteAlways("boaobjectivesset",0,1,3,"MO_C2M6B_S1");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,3,"MO_ICON_OPN");
+}
+
+script 200 (void)
+{
+	//Prim Objective 1 solved
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,0,"MO_ICON_ACC");	
+	ACS_NamedExecuteAlways("boaobjectiveaccomplished",0,0,0,0);
+}
+
+script 201 (void)
+{
+	//Prim Objective 2 solved
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,1,"MO_ICON_ACC");	
+	ACS_NamedExecuteAlways("boaobjectiveaccomplished",0,0,0,0);
+}
+
+script 202 (void)
+{
+	//Prim Objective 3 solved
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,2,"MO_ICON_ACC");	
+	ACS_NamedExecuteAlways("boaobjectiveaccomplished",0,0,0,0);
+}
+
+script 203 (void)
+{
+	//Sec Objective 1 solved
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,3,"MO_ICON_ACC");	
+	ACS_NamedExecuteAlways("boaobjectiveaccomplished",0,0,0,0);
+}
+
+//////////////////////////////////////
+////// Generic Effect Scripts ////////
+//////////////////////////////////////
+
+script "IceWater" OPEN
+{
+        SectorDamage(50, 15, "IceWater", "", DAMAGE_PLAYERS);
+        delay(70);
+        restart;
+}
+
+script 402 ENTER { //Setup the player & Map
+
+        //Plane Reflection
+        Sector_SetPlaneReflection(61, 32, 0);
+        Sector_SetFriction(61, 1.5);
+}
+
+script 403 OPEN { //Spark Spawner (id 42)
+	thing_activate(138);
+	delay(random(10,20));
+	thing_deactivate(138);
+	delay(random(35,350));
+	restart;
+}
+
+script 404 (int vent_id) { //Generic vent breaker script
+	SetLineBlocking(vent_id,BLOCK_NOTHING);
+}
+
+script 405 (int toilet_id) { //Generic Flush Sound WC
+	PlaySound(toilet_id,"toilet/flush",CHAN_BODY,1.0,0,0);
+}
+
+
+script 406 (int line_id) { //Generic Mirror Script
+	TranslucentLine(line_id,255);
+	GlassBreak(0);
+	SetLineTexture(line_id,SIDE_FRONT,TEXTURE_MIDDLE,"MIRR_W04");
+}
+
+script 407 OPEN { //Water Waggle & Plane Reflection
+	//Ceiling_Waggle(30,32,16,0,0);
+	//Sector_SetPlaneReflection(128,20,0);
+}
+
+script 408 (int light_tid) { //Generic Light Script
+	if(!GetActorProperty(light_tid,APROP_Dormant))
+		Thing_Deactivate(light_tid);
+	else
+		Thing_Activate(light_tid);
+	PlaySound(0,"SW_LIGHT");
+}
+
+script 409 (void) { //Generic Ladder Script
+    ThrustThingZ(0, 15, 0, 0);
+    ACS_NamedExecute("Laddersound", 0, 0, 0, 0);
+}
+
+script "Laddersound" (void)
+{
+    PlaySound (0, "world/ladder", CHAN_BODY, 0.71);
+    delay(15);
+}
+
+Script 501 (int supplychestid)	//Supply Chest Script
+{
+	ACS_NamedExecuteAlways("SupplyChest",0,supplychestid,6);//Grenades
+}
+
+Script 502 (int supplychestid)	//Supply Chest Script 2
+{
+	ACS_NamedExecuteAlways("SupplyChest",0,supplychestid,1);//100 Coins
+}

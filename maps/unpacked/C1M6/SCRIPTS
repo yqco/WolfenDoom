@@ -1,0 +1,551 @@
+#include "zcommon.acs"
+
+script "OBJECTIVES" OPEN
+{
+	//Set primary objectives
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,0,"MO_ICON_OPN");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,1,0,"MO_C1M6_P1");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,1,"MO_ICON_OPN");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,1,1,"MO_C1M6_P2");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,2,"MO_ICON_OPN");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,1,2,"MO_C1M6_P3");
+	//Set secondary objectives
+	ACS_NamedExecuteAlways("boaobjectivesset",0,1,3,"MO_C1M6_S1");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,3,"MO_ICON_OPN");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,1,4,"MO_C1M6_S2");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,4,"MO_ICON_OPN");
+}
+
+script 201 (void)
+{
+	//Prim Objective 1 solved
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,0,"MO_ICON_ACC");	
+	ACS_NamedExecuteAlways("boaobjectiveaccomplished",0,0,0,0);
+}
+
+script 202 (void)
+{
+	//Prim Objective 2 solved
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,1,"MO_ICON_ACC");	
+	ACS_NamedExecuteAlways("boaobjectiveaccomplished",0,0,0,0);
+}
+
+script 203 (void)
+{
+	//Sec Objective 1 solved
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,3,"MO_ICON_ACC");	
+	ACS_NamedExecuteAlways("boaobjectiveaccomplished",0,0,0,0);
+}
+
+script 204 (void)
+{
+	//Sec Objective 2 solved
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,1,"MO_ICON_ACC");	
+	ACS_NamedExecuteAlways("boaobjectiveaccomplished",0,0,0,0);
+}
+
+
+
+
+
+script 100 OPEN //Setting up the map
+{
+	Sector_SetDamage(88,200,0);
+}
+
+script 99 ENTER
+{
+	GiveInventory("KnifeSilent",1);
+	GiveInventory("Walther9mm",1);
+	GiveInventory("Browning5",1);
+	SetWeapon("Browning5");
+}
+
+
+int intSetVolume = 1.0;
+
+Script "SetMusicVolumeFactor" (int intTargetVolume, int intDelay)
+{
+   intTargetVolume *= 256;
+
+   If (intDelay > 0)
+   {
+      int intStepSize = (intSetVolume - intTargetVolume) / intDelay;
+
+      For (int i = 0; i <= intDelay; i++)
+      {
+         SetMusicVolume(intSetVolume - (intStepSize * i));
+         Delay(1);
+      }
+   }
+
+   SetMusicVolume(intTargetVolume);
+   intSetVolume = intTargetVolume;
+}
+
+
+script 187 (void)
+{
+	ACS_NamedExecuteAlways("SetMusicVolumeFactor", 0, 128, 35);
+	delay(35);
+	SetMusicVolume(1.0);
+	
+	localsetmusic("music/C1M6_MUS.ogg");
+}
+
+script 101 (void)
+{
+	ACS_NamedExecuteAlways("SetMusicVolumeFactor", 0, 128, 35);
+	delay(35);
+	SetMusicVolume(1.0);
+	
+	localsetmusic("music/C1M6_MU2.ogg");
+}
+
+script 102 (void) //Easter Egg Serious Sam Style
+{
+	thing_move(244,245,1);
+	delay(1);
+	Thing_Hate(244,0,3);
+}
+
+script 103 (void) //Spike Fire Room 1
+{
+	SpawnProjectile(16,"Nail",192,90,0,0,0);
+	delay(17);
+	SpawnProjectile(17,"Nail",0,90,0,0,0);
+	delay(17);
+	restart;
+}
+
+script 104 (void) //Spike Fire Room 2
+{
+	Thing_Activate(58);
+	delay(8);
+	Thing_Activate(60);
+	delay(4);
+	SpawnProjectile(56,"Nail",0,90,0,0,0);
+	delay(3);
+	SpawnProjectile(57,"Nail",128,90,0,0,0);
+	delay(5);
+	SpawnProjectile(59,"Nail",64,90,0,0,0);
+	delay(10);
+	SpawnProjectile(63,"Nail",192,90,0,0,0);
+	delay(16);
+	Thing_DeActivate(58);
+	delay(8);
+	Thing_DeActivate(60);
+	delay(24);
+	restart;
+}
+
+script 105 (int spikeangle) //Spike over Lava
+{
+	for(spikeangle=224;spikeangle<288;spikeangle+=2)
+	{
+		SpawnProjectile(81,"NailFlame",spikeangle,90,0,0,0);
+		delay(2);
+	}
+	delay(105);
+	restart;
+}
+
+script 106 (void) //Ground Spike hallway
+{
+	thing_activate(85);
+	thing_deactivate(86);
+	delay(70);
+	thing_deactivate(85);
+	thing_activate(86);
+	delay(70);
+	restart;
+}
+
+script 107 (void) //Smoke monster sound
+{
+	ambientsound("Smoke/pain",80);
+}
+
+int platrise;
+
+script 108 (void) //Platforms in Lavaroom
+{
+	floor_raisebyvalue(89,10,248);
+	floor_raisebyvalue(90,10,216);
+	thing_remove(173);
+}
+
+script 109 (void) //Smoke monster appearing
+{
+	ambientsound("Smoke/pain2",100);
+	thing_projectile(92,171,64,100,-1);
+}
+
+script 110 (void) //Set line special Smoke
+{
+	SetLineSpecial(94,80,109,0,0,0,0);
+}
+
+script 111 (void) //Tomb Raider Secret
+{
+	ambientsound("TRSECRET",100);
+	platrise=1;
+}
+
+script 112 (void) //Trap Treasure Room
+{
+	ambientsound("Smoke/pain",80);
+	Floor_RaiseByValue(96,10,192);
+	Light_Fade(97,0,135);
+	Radius_Quake(1,3*35,0,20,98);
+	delay(105);
+	Radius_Quake(2,16*35,20,20,98);
+}
+
+script 113 (void) //Killed Boss Enemy
+{
+	spawnspotfacing("General",100,305);
+	Radius_Quake(1,3*35,0,40,106);
+	spawnspotfacing("Guard",101,305);
+	thing_deactivate(305);
+	SetLineSpecial(102,80,255,0,0,0,0);
+	Polyobj_DoorSlide(151,2,64,48,9999);
+	acs_execute(115,0,0,0,0);
+}
+
+script 114 (void) //Prepare Boss Battle
+{
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,2,"MO_ICON_ACC");	
+	ACS_NamedExecuteAlways("boaobjectiveaccomplished",0,0,0,0);
+	delay(35);
+	Radius_Quake(1,3*35,0,40,106);
+	ambientsound("Smoke/pain",80);
+	delay(3*35);
+	thing_move(105,106,1);
+	thing_activate(105);
+	acs_execute(49,0,0,0,0);
+ setmusic("music/D_BOSS.ogg");
+ SetLineSpecial(115, 0, 0, 0, 0, 0, 0);
+}
+int message_finished;
+
+script 115 (void)
+{
+	delay(3*35);
+	ACS_NamedExecuteAlways("BoADialogue",0,"MS_DARR1","MS_DARR0","DARRENMESSAGE12");
+	delay(5*35);
+	setmusic("music/HURRY.ogg");
+ ACS_Execute(192,0,0,0,0);
+}
+
+script 192 (void) //Quakes when running back
+{
+    Radius_Quake(1, 70, 0, 10, 192);
+    spawnspotforced("FallingRock", random(301,305), 0, random(1,220));
+    delay(random(1,20));
+    spawnspotforced("FallingRock", random(301,305), 0, random(1,220));
+    delay(random(1,20));
+    spawnspotforced("FallingRock", random(301,305), 0, random(1,220));
+    delay(random(1,20));
+    spawnspotforced("FallingRock", random(301,305), 0, random(1,220));
+    delay(random(70,280));
+    restart;
+}
+
+script 116 (void)
+{
+	SpawnProjectile(108,"Nail",192,90,0,0,0);
+	delay(30);
+	restart;
+}
+
+script 117 (void)
+{
+	thing_hate(111,112,1);
+	thing_hate(112,111,3);
+}
+
+script 118 (void)
+{
+	if(platrise==1)
+		Plat_DownWaitUpStay(89,10,35);
+}
+
+script 119 (void) //Room bottom
+{
+	SpawnProjectile(175,"Nail",0,90,0,0,0);
+	delay(25);
+	restart;
+}
+
+script 255 (void) //Ending Sequence
+{
+	SetPlayerProperty(1,1,PROP_FROZEN);
+	ACS_NamedExecute("CLEAR INVENTORY", 0);
+    acs_terminate(192, 0);
+	setmusic("music/D_INTER.ogg");
+	SetHudSize(480,320,1);
+	// Fade to black
+	SetFont("BLACKBG");
+	hudmessagebold(s: "a"; HUDMSG_FADEINOUT,14,CR_WHITE,240.0,160.0,2.0,3.0,3.0); //...and back
+	delay(3*35);
+	// Add the moviehud
+	SetFont("MOVIEHUD");
+    HudMessage(s: "A"; HUDMSG_FADEINOUT, 2, CR_UNTRANSLATED, 320.0, 240.0, 9999.0, 0.0, 0.0);
+	//Hide the regular HUD
+	GiveInventory("CutsceneEnabled", 1);
+	//Change Camera to the room
+	ChangeCamera(174, 1, 0);
+	Thing_Activate(174);
+	//SetFont("ENDC1");
+	//hudmessagebold(s: "a"; HUDMSG_FADEINOUT,13,CR_WHITE,240.0,160.0,999.0,2.0,0.0);
+	delay(2*35);
+	SetPlayerProperty(1,0,PROP_FROZEN);
+	SetHudSize(640,480,1);
+	SetFont("SMALLFONT");
+	hudmessagebold(l:"EPILOGUEC1"; HUDMSG_TYPEON,11,CR_WHITE,170.1,120.1,3.0,0.072,2.0);
+	ambientsound("EPILOGUEC1",128);
+	delay(3*35);
+	hudmessagebold(s: "Press <use> to skip the sequence"; HUDMSG_FADEINOUT,12,CR_GRAY,320.0,460.0,3.0,1.0,1.0);
+	acs_execute(256, 0, 0, 0, 0);
+
+	int buttons;
+	while (TRUE)
+	{
+		buttons = GetPlayerInput(-1,INPUT_BUTTONS);
+		if (buttons & BT_USE)
+		{
+			SetHudSize(480,320,1);
+			SetFont("BLACKBG");
+			hudmessagebold(s: "a"; HUDMSG_FADEINOUT,10,CR_WHITE,240.0,160.0,999.0,2.0,0.0);
+			delay(2*35);
+			//Hide the regular HUD
+			TakeInventory("CutsceneEnabled", 1);
+			exit_normal(0);
+		}
+		delay(1);
+	}
+}
+
+script 256 (void) //Open cellar door
+{
+	delay(55*35);
+	Polyobj_DoorSwing(1, 8, 64, 9999999);
+}
+
+script 1 (int light_tid) //Generic Light Script
+{
+	if(!GetActorProperty(light_tid,APROP_Dormant))
+		Thing_Deactivate(light_tid);
+	else
+		Thing_Activate(light_tid);
+	PlaySound(0,"SW_LIGHT");
+}
+
+script 3 (int line_id) //Generic Mirror Script
+{
+	TranslucentLine(line_id,255);
+	GlassBreak(0);
+	SetLineTexture(line_id,SIDE_FRONT,TEXTURE_MIDDLE,"MIRR_W04");
+}
+
+script 4 (void) //Soldier dropping Luger
+{
+	delay(10);
+	spawnspotforced("Luger9mm",37,0,0);
+}
+
+script 5 (int toilet_id) //Generic Flush Sound WC
+{
+	PlaySound(toilet_id,"toilet/flush",CHAN_BODY,1.0,0,0);
+}
+
+script 600 (void)
+{
+	Playsound(0,"NailHitBleed");
+	Thing_Damage(0,250,0);
+}
+
+////////////////////
+// Health Display //
+////////////////////
+
+script 49 (void)
+{
+	SetActorProperty(105,APROP_Health,3000);
+	ACS_NamedExecuteAlways("BossHealth",0,105,3000);
+}
+
+//Generic Light Script
+script 408 (int light_tid)
+{
+	if(!GetActorProperty(light_tid,APROP_Dormant))
+		Thing_Deactivate(light_tid);
+	else
+		Thing_Activate(light_tid);
+	PlaySound(0,"SW_LIGHT");
+}
+
+/////////////////////////////////
+//// Messages various ones //////
+/////////////////////////////////
+
+script 987 OPEN
+{
+	delay(3*35);
+	ACS_NamedExecuteAlways("BoADialogue",0,"MS_DARR1","MS_DARR0","DARRENMESSAGE11");
+}
+
+
+/////////////////////////////////
+//// Mine Cart Indy Style ///////
+/////////////////////////////////
+
+// Is the ride sequence active?
+bool truckSequenceActive;
+
+// This script should be activated by the player, where the railMover is the "Path Follower" and the truck the "Model"
+Script "TruckSequence" (int railMover, int truck)
+{
+   // Exclamation mark deactivate
+   Thing_Deactivate(132);
+   
+   // Store viewheight and set a new one according to the ride
+   int oldViewHeight = GetActorProperty(0, APROP_ViewHeight);
+   SetActorProperty(0, APROP_ViewHeight, oldViewHeight - 20.0);
+   
+   // Ensure player has a tid
+   if (!ActivatorTID())
+	  Thing_ChangeTID(0, UniqueTID(-32768, 0));
+   int player = ActivatorTID();
+   
+   // Force player to use a certain weapon on the ride
+   //str weap = GetWeapon();
+   //GiveInventory("NoWeapon", 1);
+   //SetWeapon("NoWeapon");
+   
+   // Is the ride sequence already active on another player?
+   bool extraPlayer = false;
+   
+   //Rough speed of the cart; used to play speed-based sounds
+   int cartSpeed = 0;
+   
+   // Activate the railMover
+   if (!truckSequenceActive)
+   {
+	  Thing_Activate(railMover);
+	  truckSequenceActive = true;
+	  
+	  // Start playing the movement sound
+	  PlaySound(truck, "CARTROLL", CHAN_BODY, 1.0, true);
+   }
+   else // If sequence is already active, this is an extra player
+	  extraPlayer = true;
+   
+   // Variables
+   int tox, toy;         // Truck x and y offsets, to eliminate most possible jitters
+   int ota, ta, otp, tp; // Old truck angle, truck angle, old truck pitch, truck pitch
+   int pa, pp;           // Player angle, player pitch, explanation below
+   
+   while (truckSequenceActive)
+   {
+	  // Move ride along rail
+	  if (!extraPlayer)
+	  {
+		 SetActivator(truck);
+		 tox = GetActorVelX(railMover) - GetActorVelX(0);
+		 toy = GetActorVelY(railMover) - GetActorVelY(0);
+		 ota = GetActorAngle(0);
+		 otp = GetActorPitch(0);
+		 Warp(railMover, tox, toy, 0, 0, WARPF_ABSOLUTEOFFSET|WARPF_INTERPOLATE|WARPF_STOP|WARPF_NOCHECKPOSITION);
+		 ChangeActorPitch(0, (1.0 - GetActorPitch(railMover)), true);
+		 ta  = GetActorAngle(0);
+		 tp  = GetActorPitch(0);
+		 
+		 If (tp < 0) { cartSpeed += 1; }
+		 Else If (tp > 0) { cartSpeed -= 1; }
+		 
+		 PlaySound(truck, StrParam(s:"CARTROL", d:cartspeed / 100), CHAN_BODY, 1.0, true);
+	 	 		  
+		  // Tilt the ride on turns, angle based on how quickly it is turning
+		 int rollAmt = (ta - ota) / 3;
+		 If (abs(rollAmt) < 500)
+		 {
+			ChangeActorRoll(0, rollAmt, TRUE);
+			If (abs(rollAmt) > 200 || cartSpeed > 400) PlaySound(truck, "CARTSQUE", CHAN_7, 1.0, FALSE);
+		 }
+	  }
+   
+	  // Move player along rail
+	  // Get player angle so we can restore it after the warp
+	  // We do this instead of using WARPF_USECALLERANGLE so that
+	  // the offsets don't get messed up when the truck rotates.
+	  SetActivator(player);
+	  pa = GetActorAngle(0);
+	  pp = GetActorPitch(0);
+	  Warp(truck, -10.0 + (GetActorPitch(railMover) * 300), 0, 30.0, 0, WARPF_COPYINTERPOLATION|WARPF_STOP|WARPF_NOCHECKPOSITION);
+	  // variant 1 for making the player dependent from ride movement...
+	  //ChangeActorAngle(0, pa + (ta - ota), true);
+	  //ChangeActorPitch(0, pp - (tp - otp) * 3 / 5, true);
+	  
+	  // ...or variant 2 for making the player independent from ride movement
+	  ChangeActorAngle(0, pa, true);
+	  
+	  // Reduce player velocity to 0 (prevents movement bobbing during entire ride)
+	  SetActorVelocity(0, 0, 0, 0, false, true);
+	  
+	  Delay(1);
+   }
+   
+   // Stop rail and sound, then play stop sound if this was the orignal activator of the sequence
+   if (!extraPlayer)
+   {
+	  StopSound(truck, CHAN_BODY);
+	  Thing_Deactivate(railMover);
+	  PlaySound(truck, "CARTSTOP");
+   }
+   
+   // Get player out of the ride
+   SetActivator(player);
+   
+   // Define the position where each player exits
+   switch (PlayerNumber())
+   {
+	  default:
+	  case 0: Warp(truck, 64.0, 0.0, 30.0, 0, WARPF_COPYINTERPOLATION|WARPF_STOP|WARPF_NOCHECKPOSITION); break;
+	  case 1: Warp(truck, 64.0, 0.0, 30.0, 0, WARPF_COPYINTERPOLATION|WARPF_STOP|WARPF_NOCHECKPOSITION); break;
+	  case 2: Warp(truck, 64.0, 0.0, 30.0, 0, WARPF_COPYINTERPOLATION|WARPF_STOP|WARPF_NOCHECKPOSITION); break;
+	  case 3: Warp(truck, 64.0, 0.0, 30.0, 0, WARPF_COPYINTERPOLATION|WARPF_STOP|WARPF_NOCHECKPOSITION); break;
+   }
+   
+   // Restore the viewheight
+   SetActorProperty(0, APROP_ViewHeight, oldViewHeight);
+   
+   // Give player their weapon back
+   //SetWeapon(weap);
+   //TakeInventory("NoWeapon", 1);
+}
+
+Script "EndTruckSequence" (void)
+{
+   // End ride sequence
+   truckSequenceActive = false;
+   
+   // Exclamation mark activate
+   Thing_Activate(132);
+}
+	
+Function int abs (int x)
+{
+    if (x < 0) return -x;
+    return x;
+}
+
+Script "CartHit" (void)
+{
+   If (PlayerNumber() == -1) //If it's not a player
+   {
+      DamageThing(0); //Blow it up
+      PlaySound(0, "cartstop");
+   }
+}

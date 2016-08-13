@@ -1,0 +1,544 @@
+#include "zcommon.acs"
+
+global int 1:disable_mutants; //mxd. When set to true, Mutant and MutantMelee will immediately despawn after spawning.
+global int 2:disable_big_mutants; //mxd. When set to true, BigMutant1 and BigMutant2 will immediately despawn after spawning.
+global int 3:disable_supermutants; //mxd. When set to true, UberMutant and SuperMutant will immediately despawn after spawning.
+
+////////////////
+// Objectives //
+////////////////
+
+script "OBJECTIVES" OPEN
+{
+	//Set primary objectives
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,0,"MO_ICON_OPN");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,1,0,"MO_C1M0_P1");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,1,"MO_ICON_OPN");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,1,1,"MO_C1M0_P2");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,2,"MO_ICON_OPN");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,1,2,"MO_C1M0_P3");
+	//Set secondary objectives
+	ACS_NamedExecuteAlways("boaobjectivesset",0,1,3,"MO_C1M0_S1");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,3,"MO_ICON_OPN");
+}
+
+script 201 (void)
+{
+	//Prim Objective 1 solved
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,0,"MO_ICON_ACC");	
+	ACS_NamedExecuteAlways("boaobjectiveaccomplished",0,0,0,0);
+}
+
+script 202 (void)
+{
+	//Prim Objective 2 solved
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,1,"MO_ICON_ACC");	
+	ACS_NamedExecuteAlways("boaobjectiveaccomplished",0,0,0,0);
+}
+
+script 203 (void)
+{
+	//Prim Objective 2 solved
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,2,"MO_ICON_ACC");	
+	ACS_NamedExecuteAlways("boaobjectiveaccomplished",0,0,0,0);
+	SetLineSpecial(213, 0, 0, 0, 0, 0, 0);
+}
+
+//////////////////////////
+//////  Map Setup  ///////
+//////////////////////////
+
+script 1 OPEN
+{
+    //Moving Water
+    scroll_floor(12, 0, 228, 0);
+    scroll_ceiling(12, 0, 228, 0);
+
+    //Damage Canyon
+    Sector_SetDamage(1, 255, 0);
+    Sector_SetDamage(12, 255, 0);
+
+    //Smoke Generators Deactivation
+    thing_deactivate(184);
+
+    //Dialogue from Darren
+    ACS_NamedExecuteAlways("BoADialogue",0,"MS_DARR1","MS_DARR0","DARRENMESSAGE14");
+}
+
+script "Armory" ENTER
+{
+        GiveInventory("Browning5",1);
+        GiveInventory("12GaugeAmmo",16);
+        GiveInventory("Luger9mm",1);
+        GiveInventory("9mmAmmo",24);
+        GiveInventory("KnifeSilent",1);
+        GiveInventory("Kar98k", 1);
+        GiveInventory("C4", 3);
+        SetWeapon("Browning5");
+}
+
+script "MutantPoison" OPEN
+{
+        SectorDamage(93, 5, "MutantPoison", "", DAMAGE_PLAYERS);
+        delay(105);
+        restart;
+}
+
+script 9 OPEN
+{
+    thing_activate(random(205,209));
+    delay(random(10,30));
+    restart;
+}
+
+////////////////////
+// Health Display //
+////////////////////
+
+script 49 (void)
+{
+	SetActorProperty(105,APROP_Health,3000);
+	ACS_NamedExecuteAlways("BossHealth",0,105,3000);
+}
+
+//////////////////////////////
+//// Map specific Scripts ////
+//////////////////////////////
+
+//First Gate lower
+script 101 (void)
+{
+    floor_lowerbyvalue(18, 10, 128);
+    floor_lowerbyvalue(17, 10, 128);
+}
+
+//Mutant Trap
+script 102 (void)
+{
+    Door_CloseWaitOpen(31, 20, 35);
+    delay(2*35);
+    Door_Open(30, 16, 0);
+    delay(2*35);
+    Door_Open(33, 16, 0);
+    delay(2*35);
+    Door_Open(34, 16, 0);
+}
+
+//Second Gate lower
+script 103 (void)
+{
+    floor_lowerbyvalue(38, 10, 128);
+    floor_lowerbyvalue(39, 10, 128);
+	Thing_ChangeTID(190,0); //needed for the 2nd SSTank1
+}
+
+//Large elevator
+int elevator_level=4;
+int elevator_escape=0;
+
+script 104 (int elevator_direction)
+{
+    if(elevator_direction==1 && elevator_level>1)
+    {
+        floor_lowerbyvalue(68, 10, 384);
+        ceiling_lowerbyvalue(68, 10, 384);
+        elevator_level--;
+		delay(9*35);
+		acs_terminate(104,0);
+    }
+    if(elevator_direction==0 && elevator_level<4)
+    {
+        floor_raisebyvalue(68, 10, 384);
+        ceiling_raisebyvalue(68, 10, 384);
+        elevator_level++;
+		delay(9*35);
+		acs_terminate(104,0);
+    }
+	if(elevator_direction==0 && elevator_level==1 && elevator_escape==1)
+    {
+        floor_raisebyvalue(68, 10, 3*384);
+        ceiling_raisebyvalue(68, 10, 3*384);
+        elevator_level=4;
+		delay(9*35);
+		acs_terminate(104,0);
+    }
+}
+
+//Activate next access level Torm: not needed anymore
+script 204 (void)
+{
+    //accessnextlevel = 1;
+    //printbold(s:"\cJNext level \cCaccess granted.");
+
+}
+
+/*script 205 (void)
+{
+    spawnspotfacing("Mutant", 116, 0);
+    spawnspotfacing("MutantMelee", 115, 0);
+}*/
+
+//Power Backup
+script 105 (void)
+{
+    thing_activate(90);
+    ambientsound("LightOn", 127);
+    SetLineActivation(92, SPAC_Use);
+    spawnspotfacing("BigMutant2", 191, 0);
+	setlineblocking(216, BLOCK_NOTHING);
+}
+
+//Rockettrap 1
+script 106 (int fireburst1)
+{
+    while(fireburst1<10)
+    {
+            Thing_Projectile(97, 222, random(56,72), 110, 0);
+            delay(random(2,4));
+            fireburst1++;
+    }
+    fireburst1=0;
+    delay(105);
+    restart;
+}
+
+//Rockettrap 2
+script 107 (int fireburst2)
+{
+    while(fireburst2<10)
+    {
+            Thing_Projectile(98, 222, random(120,136), 110, 0);
+            delay(random(2,4));
+            fireburst2++;
+    }
+    fireburst2=0;
+    delay(105);
+    restart;
+}
+
+//Rockettrap 3
+script 108 (int fireburst3)
+{
+    while(fireburst3<10)
+    {
+            Thing_Projectile(99, 222, 128, 70, 0);
+            Thing_Projectile(100, 222, 0, 70, 0);
+            delay(random(2,4));
+            fireburst3++;
+    }
+    fireburst3=0;
+    delay(105);
+    restart;
+}
+
+//Ambush in Lager
+script 109 (void)
+{
+    spawnspotfacing("WMP40Guard", 115);
+    spawnspotfacing("WRifleGuard", 116);
+}
+
+//Rockettrap 5
+script 110 (int fireburst5)
+{
+    while(fireburst5<10)
+    {
+            Thing_Projectile(152, 222, random(1,255), 1, -60);
+            Thing_Projectile(154, 222, random(1,255), 1, -60);
+            delay(random(2,4));
+            fireburst5++;
+    }
+    fireburst5=0;
+    delay(random(15,105));
+    restart;
+}
+
+//Boss Battle
+script 111 (void)
+{
+    //printbold(s:"Boss battle initiated");
+
+    delay(105);
+
+    floor_raisebyvalue(162, 30, 376);
+    floor_raisebyvalue(166, 30, 376);
+
+    floor_lowerbyvalue(161, 10, 120);
+    ceiling_lowerbyvalue(161, 10, 120);
+
+    Door_CloseWaitOpen(153, 16, 10, 0);
+
+    SetMusic("D_BOSS", 0, 0);
+
+    delay(35);
+    acs_execute(117, 0, 0, 0, 0);
+}
+
+//Boss Battle Ende
+script 112 (void)
+{
+    //printbold(s:"Boss battle finished");
+
+    SetMusic("C1M0_MUS", 0, 0);
+
+    SetLineSpecial(163, 80, 113, 0, 0, 0, 0);
+    thing_activate(165);
+
+    acs_terminate(117, 0);
+    thing_destroy(567, 0, 0);
+}
+
+//End Boom Script
+int countdown_crate=5;
+
+script 113 (void)
+{
+    //printbold(s:"Runaway script");
+
+    acs_terminate(122, 0);
+
+    thing_deactivate(165);
+    thing_activate(164);
+    ThingSound(165,"DSDETOP",127);
+    SetLineTexture(199, SIDE_FRONT, TEXTURE_MIDDLE, "C4_01");
+    TakeInventory("C4", 1);
+
+    while(countdown_crate>0)
+    {
+            ThingSound(165,"DSDETON",127);
+            countdown_crate--;
+            delay(35);
+    }
+    SpawnSpotForced("SceneryExplosion_Large",165,0,0); //spawn tweaked one - ozy81
+    SpawnSpotForced("JunkPile1",165,0,0);
+    ThingSound(165,"panzer/explode",66);
+    thing_remove(165);
+    Floor_LowerInstant(166, 0, 96);
+    SetLineTexture(199, SIDE_FRONT, TEXTURE_MIDDLE, "-");
+
+
+    delay(35);
+    SetMusic("HURRY", 0, 0);
+    thing_activate(149);
+    thing_activate(184); //Smoke generators activation
+    ACS_Execute(115,0,0,0,0);
+    ACS_Execute(116,0,0,0,0);
+	ACS_NamedExecute("FireFog",0,0,0,0);
+    thing_deactivate(176);
+
+    disable_supermutants=1;
+	ACS_Execute(202, 0, 0, 0, 0); //Objective 2 solved
+
+    //Dialogue from Darren
+    ACS_NamedExecuteAlways("BoADialogue",0,"MS_DARR1","MS_DARR0","DARRENMESSAGE15");
+	
+	//Make elevator rise instantly
+	elevator_escape=1;
+
+    while(countdown_crate==0)
+    {
+        thing_activate(random(167,173));
+        delay(random(70,140));
+        Radius_Quake(1, 50, 0, 32, 167);
+    }
+
+}
+
+int firefog = 0;
+
+script "FireFog" (void)
+{
+	while(firefog<64)
+    {
+        sector_setfade(200, firefog*2, firefog, firefog/2);
+		sector_setcolor(200, 255, 255-(firefog*2), 255-(firefog*3), 0);
+        firefog++;
+        delay(8);
+    }
+}
+
+script 114 (void)
+{
+    LocalSetMusic("C1M0_MUS", 0, 0);
+    //SetLineSpecial(174, 243, 0, 0, 0, 0, 0);
+}
+
+//Flickering Light
+script 115 (void)
+{
+    thing_deactivate(175);
+    delay(random(1,7));
+    thing_activate(175);
+    delay(random(1,7));
+    restart;
+}
+
+//Spawning Sparks
+script 116 (void)
+{
+    thing_activate(random(177,180));
+    delay(random(5,70));
+    restart;
+}
+
+//Spawning monsters at boss battle
+script 117 (void)
+{
+    spawnspotfacing("Mutant", random(181,183), 567);
+    delay(15*35);
+    restart;
+}
+
+//Talk to Darren at the end
+script 118 (void)
+{
+    if(disable_mutants==1)
+    {
+        Exit_Normal(0);
+    }
+    else
+    {
+        //Dialogue from Darren
+        ACS_NamedExecuteAlways("BoADialogue",0,"MS_DARR1","MS_DARR0","DARRENMESSAGE28");
+    }
+}
+
+//First detonation box applied
+script 119 (void)
+{
+        ACS_NamedExecuteAlways("BoADialogue",0,"MS_DARR1","MS_DARR0","DARRENMESSAGE16");
+        ThingSound(193,"DSDETOP",127);
+        thing_remove(193);
+        SetLineSpecial(194, 0, 0, 0, 0, 0, 0);
+        SetLineTexture(197, SIDE_FRONT, TEXTURE_MIDDLE, "C4_01");
+        TakeInventory("C4", 1);
+        disable_mutants=1;
+
+}
+
+//Second detonation box applied
+script 120 (void)
+{
+        ACS_NamedExecuteAlways("BoADialogue",0,"MS_DARR1","MS_DARR0","DARRENMESSAGE16");
+        ThingSound(195,"DSDETOP",127);
+        thing_remove(195);
+        SetLineSpecial(196, 0, 0, 0, 0, 0, 0);
+        SetLineTexture(198, SIDE_FRONT, TEXTURE_MIDDLE, "C4_01");
+        TakeInventory("C4", 1);
+        disable_big_mutants=1;
+
+}
+
+//Null
+script 121 (void)
+{
+
+}
+
+//Poison Gas Timer
+int poisontimer=20*60*35;
+int poisonfader=0;
+
+script 122 (void)
+{
+    ACS_NamedExecuteAlways("BoADialogue",0,"MS_DARR1","MS_DARR0","DARRENMESSAGE17");
+
+    while(poisontimer>0)
+    {
+        delay(1);
+        poisontimer--;
+		if(poisontimer==3*60*35)
+		{
+			ACS_NamedExecuteAlways("BoADialogue",0,"MS_DARR1","MS_DARR0","DARRENMESSAGE50");
+		}
+    }
+
+    //Time to flood the area!
+    ACS_NamedExecuteAlways("BoADialogue",0,"MS_DARR1","MS_DARR0","DARRENMESSAGE18");
+
+    while(poisonfader<200)
+    {
+        sector_setfade(200, poisonfader, 0, poisonfader);
+        poisonfader++;
+        delay(4);
+        //printbold(i:poisonfader);
+    }
+
+    while(0==0)
+    {
+        SectorDamage(200, 10, "MutantPoison", "", DAMAGE_PLAYERS);
+        delay(140);
+    }
+}
+//////////////////////////////////////
+////// Generic Effect Scripts ////////
+//////////////////////////////////////
+
+script 402 ENTER
+//Setup the player
+{
+	GiveInventory("Luger9mm",1);
+	GiveInventory("9mmAmmo",8);
+	GiveInventory("KnifeSilent",1);
+	SetWeapon("Luger9mm");
+}
+
+//Spark Spawner Script
+script 403 OPEN
+{
+	thing_activate(42);
+	delay(random(10,20));
+	thing_deactivate(42);
+	delay(random(35,350));
+	restart;
+}
+
+//Generic vent breaker script
+script 404 (int vent_id)
+{
+	SetLineBlocking(vent_id,BLOCK_NOTHING);
+}
+
+//Generic Flush Sound WC
+script 405 (int toilet_id)
+{
+	PlaySound(toilet_id,"toilet/flush",CHAN_BODY,1.0,0,0);
+}
+
+//Generic Mirror Script
+script 406 (int line_id)
+{
+	TranslucentLine(line_id,255);
+	GlassBreak(0);
+	SetLineTexture(line_id,SIDE_FRONT,TEXTURE_MIDDLE,"MIRR_W04");
+}
+
+//Water Waggle & Plane Reflection
+script 407 OPEN
+{
+	//Ceiling_Waggle(30,32,16,0,0);
+	Sector_SetPlaneReflection(128,20,0);
+}
+
+//Generic Light Script
+script 408 (int light_tid)
+{
+	if(!GetActorProperty(light_tid,APROP_Dormant))
+		Thing_Deactivate(light_tid);
+	else
+		Thing_Activate(light_tid);
+	PlaySound(0,"SW_LIGHT");
+}
+
+//Generic Ladder Script
+script 409 (void)
+{
+    ThrustThingZ(0, 15, 0, 0);
+    ACS_NamedExecute("Laddersound", 0, 0, 0, 0);
+}
+
+script "Laddersound" (void)
+{
+    PlaySound (0, "world/ladder", CHAN_BODY, 0.71);
+    delay(15);
+}

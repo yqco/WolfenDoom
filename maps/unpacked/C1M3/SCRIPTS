@@ -1,0 +1,361 @@
+#include "zcommon.acs"
+
+int artillery_remain=5;
+int message_finished;
+
+script "OBJECTIVES" OPEN
+{
+	//Set primary objectives
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,0,"MO_ICON_OPN");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,1,0,"MO_C1M3_P1");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,1,"MO_ICON_OPN");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,1,1,"MO_C1M3_P2");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,2,"MO_ICON_OPN");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,1,2,"MO_C1M3_P3");
+	//Set secondary objectives
+	ACS_NamedExecuteAlways("boaobjectivesset",0,1,3,"MO_C1M3_S1");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,3,"MO_ICON_OPN");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,1,4,"MO_C1M3_S2");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,4,"MO_ICON_OPN");
+}
+
+script 200 (void)
+{
+	//Mark primary objective 1 complete
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,0,"MO_ICON_ACC");	
+	ACS_NamedExecuteAlways("boaobjectiveaccomplished",0,0,0,0);
+	SetLineSpecial(170, 0);
+}
+
+script 201 (void)
+{
+	//Mark primary objective 2 complete
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,1,"MO_ICON_ACC");	
+	ACS_NamedExecuteAlways("boaobjectiveaccomplished",0,0,0,0);
+}
+
+script 202 (void)
+{
+	//Mark secondary objective 2 complete
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,3,"MO_ICON_ACC");	
+	ACS_NamedExecuteAlways("boaobjectiveaccomplished",0,0,0,0);
+}
+
+script 1 (int artillery_id,int bomblight_id, int line_id)
+{
+	if(CheckInventory("C4")>=1)
+	{
+		TakeActorInventory(0, "C4", 1);
+		ThingSound(artillery_id,"DSDETOP",127);
+		thing_activate(bomblight_id);
+		SetLineSpecial (line_id, 0); //mxd
+		for(int i=5;i>0;i--)
+		{
+			ThingSound(artillery_id,"DSDETON",127);
+			delay(35);
+		}
+		SpawnSpotForced("GeneralExplosion_Large",artillery_id,0,0);
+		SpawnSpotForced("88mmFlakDestroyed",artillery_id,0,GetActorAngle(artillery_id) >> 8); //mxd. Better than junkpile :)
+		ThingSound(artillery_id,"panzer/explode",66);
+		thing_remove(artillery_id);
+		thing_remove(bomblight_id);
+		artillery_remain--;
+		if(!artillery_remain)
+		{
+			delay(3*35);
+			ACS_NamedExecuteAlways("BoADialogue",0,"MS_DARR1","MS_DARR0","DARRENMESSAGE06");
+			delay(5*35);
+                //Exit point for BJ set
+                SetLineSpecial(116,243,0,0,0,0,0);
+                thing_activate(147);
+                thing_move(148, 150, 1);
+                thing_move(149, 151, 1);                
+                
+			//Incoming enemies
+			SpawnSpotFacing("Paratrooper",117,0);
+			
+			//Objective primary 3 done
+			ACS_NamedExecuteAlways("boaobjectivesset",0,0,2,"MO_ICON_ACC");	
+			ACS_NamedExecuteAlways("boaobjectiveaccomplished",0,0,0,0);
+			
+			
+		}
+		else
+		{
+			
+			SetHudSize(320,200,1);
+			SetFont("HELTHBAR");
+			hudmessagebold(s: "A"; HUDMSG_FADEINOUT,3,CR_UNTRANSLATED,160.0,24.0,1.0,1.0,1.0);
+			SetFont("BIGFONT");
+			if(artillery_remain==1)
+				HudMessageBold(d:artillery_remain,s:" cannon left"; HUDMSG_FADEINOUT,1,CR_GRAY,160.0,12.0,1.0,1.0,1.0);
+			else
+				HudMessageBold(d:artillery_remain,s:" cannons left"; HUDMSG_FADEINOUT,1,CR_GRAY,160.0,12.0,1.0,1.0,1.0);
+		}
+	}
+	else
+		print(s:"\cCYou don't have any \cGC4 explosives \cCwith you!");
+}
+
+script 2 ENTER
+{
+	GiveInventory("Browning5",1);
+	GiveInventory("12GaugeAmmo",16);
+	GiveInventory("Luger9mm",1);
+	GiveInventory("9mmAmmo",24);
+	GiveInventory("KnifeSilent",1);
+	SetWeapon("Browning5");
+}
+
+// When switch near the door is pressed
+script "BrokenDoor1" (void)
+{
+	PlaySound(132, "DSDOROPN");
+	Ceiling_RaiseByValue(11, 8, 24);
+	TagWait(11);
+	PlaySound(132, "doors/dr1_stop");
+	Delay(16);
+
+	AlignThingToCeiling(131, 11);
+	AlignThingToCeiling(133, 11);
+	AlignThingToCeiling(136, 11);
+	AlignThingToCeiling(137, 11);
+
+	// Start sparkle spawners
+	Thing_Activate(133);
+	Delay(1);
+	Thing_Activate(137);
+	Delay(6);
+	Thing_Activate(131);
+	Delay(2);
+	Thing_Activate(136);
+
+	// Also on the switch
+	Delay(4);
+	Thing_Activate(134);
+
+	Delay(15);
+	PlaySound(132, "LightOff");
+
+	// Douse the lights
+	Thing_Deactivate(130);
+}
+
+// When control switch is shot
+script "BrokenDoor2" (void)
+{
+	// Switch was destroyed!
+	Thing_Activate(138);
+	Thing_Deactivate(172); //remove exclamation mark - ozy81
+	Delay(6);
+
+	//Turn on the lights
+	Thing_Activate(130);
+	PlaySound(135, "LightOn");
+
+	// Align spark spawners with the door's ceiling
+	AlignThingToCeiling(131, 11);
+	AlignThingToCeiling(133, 11);
+	AlignThingToCeiling(136, 11);
+	AlignThingToCeiling(137, 11);
+
+	// Spawn some sparkles
+	Delay(12);
+	Thing_Activate(133);
+	Delay(1);
+	Thing_Activate(137);
+	Delay(4);
+	Thing_Activate(131);
+	Delay(2);
+	Thing_Activate(136);
+	Delay(4);
+
+	// Open the door
+	PlaySound(132, "DSDOROPN");
+	Ceiling_RaiseByValue(11, 4, 76);
+	TagWait(11);
+	PlaySound(132, "doors/dr1_stop");
+
+	// Align spark spawners with the door's ceiling
+	AlignThingToCeiling(131, 11);
+	AlignThingToCeiling(133, 11);
+	AlignThingToCeiling(136, 11);
+	AlignThingToCeiling(137, 11);
+
+	// Spawn some more sparkles
+	Thing_Activate(136);
+	Delay(1);
+	Thing_Activate(131);
+	Delay(4);
+	Thing_Activate(133);
+	Delay(2);
+	Thing_Activate(137);
+}
+
+function void AlignThingToCeiling(int thingid, int sectorid)
+{
+	SetActorPosition(thingid, GetActorX(thingid), GetActorY(thingid), GetSectorCeilingZ(sectorid, 0, 0), false);
+}
+
+//Scroll Clouds in Skybox
+script 4 OPEN
+{
+	scroll_ceiling(43,0,5,0);
+	scroll_floor(43,0,5,0);
+}
+
+int outside_elev_pos=0;
+
+script 5 (void)
+{
+    if(outside_elev_pos==1)
+    {
+        floor_raisebyvalue(165, 20, 352);
+		outside_elev_pos--;
+		delay(4*35);
+		ACS_Terminate(5,0);
+    }
+    if(outside_elev_pos==0)
+    {
+        floor_lowerbyvalue(165, 20, 352);
+		outside_elev_pos++;
+		delay(4*35);
+		ACS_Terminate(5,0);
+    }
+}
+
+//////////////////////
+// Elevator Scripts //
+//////////////////////
+
+bool elevatortop;
+
+script 60 (int outside)
+{
+	floor_raisebyvalue(111,50,80);
+	if(elevatortop == TRUE)
+	{
+		Floor_LowerToNearest(105,20);
+		Floor_LowerToNearest(108,20);
+		delay(70);
+		TeleportInSector(105,109,110,0,0);
+		elevatortop = FALSE;
+		delay(140);
+		floor_lowerbyvalue(111,30,90);
+	}
+	else
+	{
+		Floor_RaiseToNearest(105,20);
+		Floor_RaiseToNearest(108,20);
+		delay(70);
+		TeleportInSector(108,110,109,0,0);
+		elevatortop = TRUE;
+		delay(140);
+		floor_lowerbyvalue(111,30,90);
+	}
+}
+
+///////////////////////////
+//// Other Map Scripts ////
+///////////////////////////
+//Let's block / unblock the outside passage for the tower where those 2 flaks and the elevator stays
+script 397 (void)
+{
+	Line_SetBlocking(173,BLOCK_PLAYERS,0);
+}
+
+script 398 (void)
+{
+	Line_SetBlocking(173,0,BLOCK_PLAYERS);
+}
+
+//Beach Attack Boms
+script 399 (void)
+{
+	int beachexplosion = random(36,41);
+	ThingSound(beachexplosion,"EXPLOSION_LEADIN",127);
+	delay(35);
+	ThingSound(beachexplosion,"panzer/explode",127);
+	thing_activate(beachexplosion);
+	delay(random(35,140));
+	restart;
+}
+
+//Plane Flyby Script
+script 400 OPEN
+{
+	AmbientSound("PLANE_FLYBY_3",100);
+	delay(80);
+	SpawnProjectile(4,"CODStuka_Flight_Fog",random(150,165),12,0,0,0);
+	delay(random(210,2100));
+	restart;
+}
+
+//Beach attacking minigun
+script 401 OPEN
+{
+	thing_hate(3,5,6);
+	delay(35*4);
+	thing_deactivate(3);
+	delay(35*20);
+	thing_activate(3);
+	restart;
+}
+
+//Generic Light Script
+script 402 (int light_tid)
+{
+	if(!GetActorProperty(light_tid,APROP_Dormant))
+		Thing_Deactivate(light_tid);
+	else
+		Thing_Activate(light_tid);
+	PlaySound(0,"SW_LIGHT");
+}
+
+//Spark Spawner Script
+script 403 OPEN
+{
+	thing_activate(10);
+	delay(random(35,350));
+	restart;
+}
+
+//Generic vent breaker script
+script 404 (int vent_id)
+{
+	SetLineBlocking(vent_id,BLOCK_NOTHING);
+}
+
+//Generic Flush Sound WC
+script 405 (int toilet_id)
+{
+	PlaySound(toilet_id,"toilet/flush",CHAN_BODY,1.0,0,0);
+}
+
+//Generic Mirror Script
+script 406 (int line_id)
+{
+	TranslucentLine(line_id,255);
+	GlassBreak(0);
+	SetLineTexture(line_id,SIDE_FRONT,TEXTURE_MIDDLE,"MIRR_W04");
+}
+
+//Generic Ladder Script
+script 407 (void)
+{
+	ThrustThingZ(0, 15, 0, 0);
+	ACS_NamedExecute("Laddersound", 0, 0, 0, 0);
+}
+
+script "Laddersound" (void)
+{
+	PlaySound (0, "world/ladder", CHAN_BODY, 0.71);
+	delay(15);
+}
+
+script 20 OPEN //Darren briefs you
+{
+	delay(3*35);
+	ACS_NamedExecuteAlways("BoADialogue",0,"MS_DARR1","MS_DARR0","DARRENMESSAGE05");
+	ACS_Execute(397,0,0,0,0); //let's block the passage for the tower with 2 flaks and the elevator (near a tractor) - ozy81
+}

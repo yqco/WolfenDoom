@@ -1,0 +1,719 @@
+#include "zcommon.acs"
+
+global int 4:astrostein; //[Ed} When set to true, grenades will change to the Astrostein variant
+
+script 1 OPEN
+{
+	astrostein=1;
+    //Kill cell solider
+    thing_destroy(6);
+
+    //Set Security Cameras
+    SetCameraToTexture(125, "ASTR_CV6", 90);
+    SetCameraToTexture(126, "ASTR_CV7", 90);
+    SetCameraToTexture(127, "ASTR_CV8", 90);
+    SetCameraToTexture(128, "ASTR_CV9", 90);
+    SetCameraToTexture(129, "ASTR_CVA", 90);
+    SetCameraToTexture(131, "ASTR_CVB", 90);
+    SetCameraToTexture(161, "ASTR_CVC", 90);
+    SetCameraToTexture(55, "ASTR_CVD", 90);
+
+    //Clear Player Inventory
+        TakeInventory("9mmAmmo", 9999);
+        TakeInventory("12GaugeAmmo", 9999);
+        TakeInventory("MauserAmmo", 9999);
+        TakeInventory("FlameAmmo", 9999);
+        TakeInventory("NebAmmo", 9999);
+        TakeInventory("PanzerAmmo", 9999);
+        Takeinventory("KnifeSilent", 9999);
+        TakeInventory("Shovel", 9999);
+        TakeInventory("Firebrand", 9999);
+        TakeInventory("Luger9mm", 9999);
+        TakeInventory("Walther9mm", 9999);
+        TakeInventory("TrenchShotgun", 9999);
+        TakeInventory("Browning5", 9999);
+        TakeInventory("MP40", 9999);
+        TakeInventory("Sten", 9999);
+        TakeInventory("G43", 9999);
+        TakeInventory("Kar98k", 9999);
+        TakeInventory("Pyrolight", 9999);
+        TakeInventory("Nebelwerfer", 9999);
+        TakeInventory("Panzerschreck", 9999);
+        TakeInventory("UMG43", 9999);
+        TakeInventory("GrenadePickup", 9999); //mxd
+        TakeInventory("BoABlueKey",1);
+        TakeInventory("BoAYellowKey",1);
+        TakeInventory("BoARedKey",1);
+        TakeInventory("BoACyanKey",1);
+        TakeInventory("BoAGreenKey",1);
+        TakeInventory("BoAPurpleKey",1);
+}
+
+
+script 2 (void)
+{
+    //Start ship movement
+    thing_activate(5);
+}
+
+script 3 (void)
+{
+    //Start station movement
+    thing_activate(16);
+}
+
+//Schleussen Ã¶ffnen
+script 4 (void)
+{
+    thing_activate(20);
+    SetLineTexture(21, SIDE_FRONT, TEXTURE_MIDDLE, "ASTR_C06");
+    door_open(22, 16, 0);
+    thing_remove(230);
+    SpawnSpotForced("EnergyTankUnLit", 231, 0, 0);
+}
+
+//Luftschleusse 1 (landing area)
+int airlock_1=0;
+
+script 5 (void)
+{
+    if(airlock_1==0)
+    {
+        //Close outer door
+            floor_raisebyvalue(39, 10, 48);
+            ceiling_lowerbyvalue(39, 10, 48);
+        thing_activate(43); //Steam from inner door active
+        delay(3*35); //Wait until inner is closed
+        thing_deactivate(43); //Steam from inner door inactive
+        thing_activate(48); //Normal Sound activated
+        //open inner door
+            floor_lowerbyvalue(41, 10, 48);
+            ceiling_raisebyvalue(41, 10, 48);
+        thing_activate(42); //Smoke from inner door active
+        delay(1*35); //wait for the smoke
+        thing_deactivate(42); //Smoke from inner door inactive
+    }
+    if(airlock_1==1)
+    {
+        //Close inner door
+            floor_raisebyvalue(41, 10, 48);
+            ceiling_lowerbyvalue(41, 10, 48);
+        thing_activate(44); //Steam from outer door active
+        delay(3*35); //Wait until outer is closed
+        thing_deactivate(44); //Steam from outer door inactive
+        thing_activate(45); //Moon Sound acticated
+        //open outer door
+            floor_lowerbyvalue(39, 10, 48);
+            ceiling_raisebyvalue(39, 10, 48);
+        thing_activate(46); //Smoke from outer door active
+        delay(1*35); //wait for the smoke
+        thing_deactivate(46); //Smoke from outer door inactive
+    }
+
+    airlock_1 = !airlock_1;
+
+}
+
+script 6 OPEN
+{
+    Thing_Projectile(49, 211, 96, 30, 0);
+    delay(70);
+    ambientsound("viper/flyby", 90);
+    delay(random(10*35, 60*35));
+    restart;
+}
+
+script 7 (void)
+{
+    floor_lowerbyvalue(36, 10, 128);
+    spawnspotfacing("AstroDrone", 37, 0);
+    spawnspotfacing("AstroCyborg1", 222, 0);
+}
+
+//Luftschleusse 2 (city)
+int airlock_2=0;
+
+script 8 (void)
+{
+    if(airlock_2==0)
+    {
+        //Close outer door
+            floor_raisebyvalue(139, 10, 48);
+            ceiling_lowerbyvalue(139, 10, 48);
+        thing_activate(143); //Steam from inner door active
+        delay(3*35); //Wait until inner is closed
+        thing_deactivate(143); //Steam from inner door inactive
+        thing_activate(148); //Normal Sound activated
+        //open inner door
+            floor_lowerbyvalue(141, 10, 48);
+            ceiling_raisebyvalue(141, 10, 48);
+        thing_activate(142); //Smoke from inner door active
+        delay(1*35); //wait for the smoke
+        thing_deactivate(142); //Smoke from inner door inactive
+    }
+    if(airlock_2==1)
+    {
+        //Close inner door
+            floor_raisebyvalue(141, 10, 48);
+            ceiling_lowerbyvalue(141, 10, 48);
+        thing_activate(144); //Steam from outer door active
+        delay(3*35); //Wait until outer is closed
+        thing_deactivate(144); //Steam from outer door inactive
+        thing_activate(145); //Moon Sound acticated
+        //open outer door
+            floor_lowerbyvalue(139, 10, 48);
+            ceiling_raisebyvalue(139, 10, 48);
+        thing_activate(146); //Smoke from outer door active
+        delay(1*35); //wait for the smoke
+        thing_deactivate(146); //Smoke from outer door inactive
+    }
+
+    airlock_2 = !airlock_2;
+
+}
+
+//deactivate forcefield in city
+script 9 (void)
+{
+    thing_deactivate(69);
+	thing_deactivate(256); //deactivate the laser beams
+    SetLineBlocking(66, BLOCK_NOTHING);
+    SetLineSpecial(66, 0, 0, 0, 0, 0, 0);
+    SetLineTexture(67, SIDE_FRONT, TEXTURE_MIDDLE, "BLACK");
+    SetLineTexture(66, SIDE_FRONT, TEXTURE_MIDDLE, "-");
+    SetLineTexture(66, SIDE_BACK, TEXTURE_MIDDLE, "-");
+    SetLineTexture(201, SIDE_FRONT, TEXTURE_MIDDLE, "BLACK");
+    ChangeFloor(68, "BLACK");
+    ChangeCeiling(68, "BLACK");
+    SetLineSpecial(79, 0, 0, 0, 0, 0, 0);
+    SetLineTexture(79, SIDE_FRONT, TEXTURE_MIDDLE, "ASTR_RE5");
+    thing_deactivate(80);
+    thing_deactivate(202); //white light off
+    thing_activate(203); //red light on
+    Radius_Quake(3, 35, 0, 16, 81);
+    thing_activate(82);
+    thing_activate(86);
+    thingsound(227, "LIGHTOFF", 127);
+    delay(4);
+    thing_deactivate(86);
+}
+
+//Train spawner
+int train_randomizer=0;
+
+script 10 (void)
+{
+    if(train_randomizer==0)
+    {
+    Thing_Projectile(119, 212, 128, 350, 0);
+    delay(13);
+    Thing_Projectile(119, 212, 128, 350, 0);
+    delay(13);
+    Thing_Projectile(119, 212, 128, 350, 0);
+    delay(13);
+    }
+
+    if(train_randomizer==1)
+    {
+    Thing_Projectile(121, 212, 0, 350, 0);
+    delay(13);
+    Thing_Projectile(121, 212, 0, 350, 0);
+    delay(13);
+    Thing_Projectile(121, 212, 0, 350, 0);
+    delay(13);
+    Thing_Projectile(121, 212, 0, 350, 0);
+    delay(13);
+    Thing_Projectile(121, 212, 0, 350, 0);
+    delay(13);
+    }
+
+    if(train_randomizer==2)
+    {
+    Thing_Projectile(122, 212, 128, 350, 0);
+    delay(13);
+    Thing_Projectile(122, 212, 128, 350, 0);
+    delay(13);
+    Thing_Projectile(122, 212, 128, 350, 0);
+    delay(13);
+    Radius_Quake(1, 35, 0, 10, 120);
+    }
+
+    if(train_randomizer==3)
+    {
+    Thing_Projectile(123, 212, 128, 350, 0);
+    delay(13);
+    Thing_Projectile(123, 212, 128, 350, 0);
+    delay(13);
+    Thing_Projectile(123, 212, 128, 350, 0);
+    delay(13);
+    }
+
+    if(train_randomizer==4)
+    {
+    Thing_Projectile(124, 212, 0, 350, 0);
+    delay(13);
+    Thing_Projectile(124, 212, 0, 350, 0);
+    delay(13);
+    Thing_Projectile(124, 212, 0, 350, 0);
+    delay(13);
+    Thing_Projectile(124, 212, 0, 350, 0);
+    delay(13);
+    Thing_Projectile(124, 212, 0, 350, 0);
+    delay(13);
+    }
+
+    train_randomizer=random(0,3);
+    delay(random(35,105));
+    restart;
+}
+
+//Display error on/off
+script 11 OPEN
+{
+    TranslucentLine(130, 255, 0);
+    thing_activate(130);
+    thingsound(130, "world/spark", 16);
+    delay(5);
+    TranslucentLine(130, 30, 1);
+    thing_deactivate(130);
+    delay(random(1,35));
+    restart;
+}
+
+//Take Spacesuit
+script 12 (void)
+{
+    TakeInventory("SpaceSuit", 1);
+    TakeInventory("PowerSpaceSuit", 1);
+}
+
+//Luftschleusse 3 (airplane)
+int airlock_3=0;
+
+script 13 (void)
+{
+    if(airlock_3==0)
+    {
+        //Close outer door
+            floor_raisebyvalue(171, 10, 48);
+            ceiling_lowerbyvalue(171, 10, 48);
+        thing_activate(178); //Steam from inner door active
+        delay(3*35); //Wait until inner is closed
+        thing_deactivate(178); //Steam from inner door inactive
+        thing_activate(175); //Normal Sound activated
+        //open inner door
+            floor_lowerbyvalue(172, 10, 48);
+            ceiling_raisebyvalue(172, 10, 48);
+        thing_activate(173); //Smoke from inner door active
+        delay(1*35); //wait for the smoke
+        thing_deactivate(173); //Smoke from inner door inactive
+    }
+    if(airlock_3==1)
+    {
+        //Close inner door
+            floor_raisebyvalue(172, 10, 48);
+            ceiling_lowerbyvalue(172, 10, 48);
+        thing_activate(177); //Steam from outer door active
+        delay(3*35); //Wait until outer is closed
+        thing_deactivate(177); //Steam from outer door inactive
+        thing_activate(176); //Moon Sound acticated
+        //open outer door
+            floor_lowerbyvalue(171, 10, 48);
+            ceiling_raisebyvalue(171, 10, 48);
+        thing_activate(174); //Smoke from outer door active
+        delay(1*35); //wait for the smoke
+        thing_deactivate(174); //Smoke from outer door inactive
+    }
+
+    airlock_3 = !airlock_3;
+
+}
+
+str column_texture[6]={"ASTR_PL1","ASTR_PL2","ASTR_PL3","ASTR_PL4","ASTR_PL5","ASTR_PL6"};
+int column_id=0;
+int column_counter=0;
+int column_firstlaunch=0;
+
+//columns for Boss Battle
+script 14 (void)
+{
+        while(column_firstlaunch==0)
+        {
+            floor_raisebyvalue(182, 16, 120);
+            SetLineBlocking(190, BLOCKF_EVERYTHING);
+            SetLineTexture(190, SIDE_BACK, TEXTURE_MIDDLE, "ASTR_F01");
+            SetLineTexture(190, SIDE_FRONT, TEXTURE_MIDDLE, "ASTR_F01");
+            thing_activate(191);
+            thing_activate(189);
+            AmbientSound("LightOn", 127);
+            column_firstlaunch++;
+        }
+
+        while(ThingCountName("AstroRobot", 189)>0)
+        {
+
+            column_id=(random(183,188));
+
+            floor_raisebyvalue(column_id, 40, 120);
+            SetLineTexture(column_id, SIDE_FRONT, TEXTURE_BOTTOM, column_texture[column_counter]);
+            delay(105);
+            while(column_counter<6)
+            {
+                SetLineTexture(column_id, SIDE_FRONT, TEXTURE_BOTTOM, column_texture[column_counter]);
+                delay(20);
+                column_counter++;
+            }
+            floor_lowerbyvalue(column_id, 40, 120);
+            column_counter=0;
+            delay(35);
+        }
+
+        SetLineBlocking(190, BLOCK_NOTHING);
+        SetLineTexture(190, SIDE_BACK, TEXTURE_MIDDLE, "-");
+        SetLineTexture(190, SIDE_FRONT, TEXTURE_MIDDLE, "-");
+        thing_deactivate(191);
+        AmbientSound("LightOff", 127);
+
+}
+
+//Deactivate Forcefield
+script 15 (void)
+{
+    thing_deactivate(199);
+    setlinetexture(200, SIDE_FRONT, TEXTURE_MIDDLE, "-");
+    setlinetexture(200, SIDE_BACK, TEXTURE_MIDDLE, "-");
+    SetLineBlocking(200, BLOCK_NOTHING);
+    AmbientSound("LightOff", 127);
+    spawnspotfacing("AstroCyborg2", 40, 0);
+}
+
+//Door Elsewhere
+script 16 (void)
+{
+    print(s:"\cCThis door is opened remotely");
+}
+
+//Deactivate Hitler forcefield
+int hitler_ff=0;
+
+script 17 (int hitler_sw)
+{
+    hitler_ff++;
+    ceiling_lowerbyvalue(hitler_sw, 48, 64);
+
+    if(hitler_ff==3)
+    {
+        ambientsound("LightOff", 127);
+        thing_deactivate(208);
+        SetLineTexture(207, SIDE_BACK, TEXTURE_MIDDLE, "-");
+        SetLineTexture(207, SIDE_FRONT, TEXTURE_MIDDLE, "-");
+        SetLineBlocking(207, BLOCK_NOTHING);
+
+        delay(8*35);
+
+        if(GetActorProperty(215, APROP_HEALTH)<80)
+        {
+            Terminate;
+        }
+
+        ambientsound("LightOn", 127);
+        thing_activate(208);
+        SetLineTexture(207, SIDE_BACK, TEXTURE_MIDDLE, "ASTR_F01");
+        SetLineTexture(207, SIDE_FRONT, TEXTURE_MIDDLE, "ASTR_F01");
+        SetLineBlocking(207, BLOCK_EVERYTHING);
+
+        hitler_ff=0;
+        ceiling_raisebyvalue(209, 48, 64);
+        ceiling_raisebyvalue(210, 48, 64);
+        ceiling_raisebyvalue(211, 48, 64);
+    }
+}
+
+//Hitler Death
+int hitler_lebt=1;
+
+script 18 (void)
+{
+    hitler_lebt=0;
+    ACS_Terminate(19, 0);
+    thing_destroy(567, 0, 0);
+    setmusic("");
+    Radius_Quake(3, 9*35, 0, 64, 216);
+    delay(0*35);
+
+    //Power Generators
+    SetLineTexture(212, SIDE_FRONT, TEXTURE_MIDDLE, "ASTR_RE5");
+    SetLineTexture(213, SIDE_FRONT, TEXTURE_MIDDLE, "-");
+    SetLineTexture(213, SIDE_BACK, TEXTURE_MIDDLE, "-");
+    ChangeFloor(217, "BLACK");
+    ChangeCeiling(217, "BLACK");
+    ambientsound("LightOff", 127);
+    thing_deactivate(214);
+
+    //Hitler Forcefield
+    SetLineTexture(207, SIDE_BACK, TEXTURE_MIDDLE, "-");
+    SetLineTexture(207, SIDE_FRONT, TEXTURE_MIDDLE, "-");
+    SetLineBlocking(207, BLOCK_NOTHING);
+    thing_deactivate(208);
+
+    //Exit Doors
+    door_open(215, 20, 0);
+	
+	//Objective accomplished
+	ACS_Execute(202, 0, 0, 0, 0);
+}
+
+//Hitlers Helfer
+script 19 (int hitler_helferspawn)
+{
+    setmusic("D_BOSS", 0, 0);
+
+    while(hitler_lebt==1)
+    {
+        hitler_helferspawn=random(218, 221);
+        spawnspotfacing("AstroCyborg2", hitler_helferspawn, 567);
+        spawnspotforced("TeleportFog", hitler_helferspawn, 567, 0);
+        delay(10*35);
+    }
+}
+
+//blue Key taken
+script 20 (void)
+{
+    thing_spawnfacing(225, "AstroElite", 0, 0);
+}
+
+//blue key trap activation
+script 21 (void)
+{
+    SetLineActivation(229, SPAC_PCross);
+}
+
+// Laser Switcher (interval)
+script 22 OPEN
+{
+	thing_activate(233);
+	thing_deactivate(235);
+	delay(random(2*35,3*35));
+	thing_deactivate(233);
+	thing_activate(235);
+	delay(random(2*35,3*35));
+	restart;
+}
+
+// Laser Level 1 (deactivate)
+int laser_lev1=0;
+
+script 23 (void)
+{
+	laser_lev1++;
+	if(laser_lev1==4)
+	{
+		thing_deactivate(242);
+		playsound(242, "LightOff");
+		delay(35);
+		door_open(243, 15, 0);
+	}
+}
+
+// Laser Level 2 (deactivate)
+int laser_lev2=0;
+
+script 24 (void)
+{
+	laser_lev2++;
+	if(laser_lev2==2)
+	{
+		thing_deactivate(249);
+		playsound(249, "LightOff");
+		delay(35);
+		door_open(248, 15, 0);
+	}
+}
+
+// Laser Level 3 (deactivate)
+int laser_lev3=0;
+
+script 25 (void)
+{
+	laser_lev3++;
+	if(laser_lev3==2)
+	{
+		thing_deactivate(247);
+		playsound(247, "LightOff");
+		delay(35);
+		door_open(246, 15, 0);
+	}
+}
+
+// Laser Switcher (row)
+int laser_sw2_count=250;
+
+script 26 OPEN
+{
+	thing_activate(laser_sw2_count);
+	delay(10);
+	thing_deactivate(laser_sw2_count);
+	laser_sw2_count++;
+	if(laser_sw2_count==256)
+	{
+		laser_sw2_count=250;
+	}
+	restart;
+}
+
+//////////////////////////////////////
+////// Generic Effect Scripts ////////
+//////////////////////////////////////
+
+script "IceWater" OPEN
+{
+        SectorDamage(47, 10, "IceWater", "", DAMAGE_PLAYERS);
+        if(airlock_1==0) {SectorDamage(52, 10, "IceWater", "", DAMAGE_PLAYERS);}
+        if(airlock_2==0) {SectorDamage(53, 10, "IceWater", "", DAMAGE_PLAYERS);}
+        if(airlock_3==1) {SectorDamage(170, 10, "IceWater", "", DAMAGE_PLAYERS);}
+        Sector_SetGravity(47, 0, 40);
+        Sector_SetGravity(97, 0, 30);
+        delay(70);
+        restart;
+}
+
+script 400 (int byteangle)
+{
+    AmbientSound("forcefield/zap", 127);
+    Thing_Damage(0, 5, 0);
+    if(LineSide() == LINE_BACK) byteangle += 128;
+    ThrustThing(byteangle, 8, 0, 0);
+    delay(10);
+}
+
+script 401 (int door_id)
+{
+    floor_lowerbyvalue(door_id, 12, 64);
+    ceiling_raisebyvalue(door_id, 12, 64);
+    delay(140);
+    floor_raisebyvalue(door_id, 12, 64);
+    ceiling_lowerbyvalue(door_id, 12, 64);
+}
+
+script 402 ENTER
+//Setup the player
+{
+	//GiveInventory("Luger9mm",1);
+	//SetWeapon("Luger9mm");
+}
+
+//Spark Spawner Script
+script 403 OPEN
+{
+	thing_activate(51);
+	delay(random(10,20));
+	thing_deactivate(51);
+	delay(random(35,350));
+	restart;
+}
+
+//Generic vent breaker script
+script 404 (int vent_id)
+{
+	SetLineBlocking(vent_id,BLOCK_NOTHING);
+}
+
+//Generic Flush Sound WC
+script 405 (int toilet_id)
+{
+	PlaySound(toilet_id,"toilet/flush",CHAN_BODY,1.0,0,0);
+}
+
+//Generic Mirror Script
+script 406 (int line_id)
+{
+	TranslucentLine(line_id,255);
+	GlassBreak(0);
+	SetLineTexture(line_id,SIDE_FRONT,TEXTURE_MIDDLE,"MIRR_W04");
+}
+
+//Water Waggle & Plane Reflection
+script 407 OPEN
+{
+	//Ceiling_Waggle(30,32,16,0,0);
+	Sector_SetPlaneReflection(128,30,0);
+ Sector_SetPlaneReflection(204,64,0);
+}
+
+//Generic Light Script
+script 408 (int light_tid)
+{
+	if(!GetActorProperty(light_tid,APROP_Dormant))
+		Thing_Deactivate(light_tid);
+	else
+		Thing_Activate(light_tid);
+	PlaySound(0,"SW_LIGHT");
+}
+
+//Generic Ladder Script
+script 409 (void)
+{
+    ThrustThingZ(0, 15, 0, 0);
+    ACS_NamedExecute("Laddersound", 0, 0, 0, 0);
+}
+
+script "Laddersound" (void)
+{
+    PlaySound (0, "world/ladder", CHAN_BODY, 0.71);
+    delay(15);
+}
+
+script "Leaving" UNLOADING
+{
+	astrostein=0;
+}
+
+////////////////
+// OBJECTIVES //
+////////////////
+
+script 300 (void)
+{
+	//Prim Objective 1 added
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,1,"MO_ICON_OPN");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,1,1,"MO_C1M1_P1");
+	ACS_NamedExecuteAlways("boaobjectiveadded",0,0,0,0);
+}
+
+script 200 (void)
+{
+	//Prim Objective 1 solved
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,0,"MO_ICON_ACC");	
+	ACS_NamedExecuteAlways("boaobjectiveaccomplished",0,0,0,0);
+}
+
+script 301 (void)
+{
+	//Prim Objective 2 added
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,1,"MO_ICON_OPN");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,1,1,"MO_C1M1_P1");
+	ACS_NamedExecuteAlways("boaobjectiveadded",0,0,0,0);
+}
+
+script 201 (void)
+{
+	//Prim Objective 2 solved
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,1,"MO_ICON_ACC");	
+	ACS_NamedExecuteAlways("boaobjectiveaccomplished",0,0,0,0);
+}
+
+script 302 (void)
+{
+	//Prim Objective 3 added
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,2,"MO_ICON_OPN");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,1,2,"MO_C1M1_P1");
+	ACS_NamedExecuteAlways("boaobjectiveadded",0,0,0,0);
+}
+
+script 202 (void)
+{
+	//Prim Objective 2 solved
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,2,"MO_ICON_ACC");	
+	ACS_NamedExecuteAlways("boaobjectiveaccomplished",0,0,0,0);
+}

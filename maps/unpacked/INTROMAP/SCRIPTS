@@ -1,0 +1,231 @@
+#include "zcommon.acs"
+
+
+int intSetVolume = 1.0;
+
+Script "SetMusicVolumeFactor" (int intTargetVolume, int intDelay)
+{
+   intTargetVolume *= 256;
+
+   If (intDelay > 0)
+   {
+      int intStepSize = (intSetVolume - intTargetVolume) / intDelay;
+
+      For (int i = 0; i <= intDelay; i++)
+      {
+         SetMusicVolume(intSetVolume - (intStepSize * i));
+         Delay(1);
+      }
+   }
+
+   SetMusicVolume(intTargetVolume);
+   intSetVolume = intTargetVolume;
+}
+
+script "CUTSCENE_START" ENTER // Start cutscene
+{
+	// Variables
+	int camx, camy, camz; 	// Camera positions
+	int camera_id=1;	  	// Moving camera's id
+	int mover_id=99;		// Actor mover's id
+	
+	setmusic("music/MOONLIT.ogg");
+
+	SetPlayerProperty(1, 1, PROP_FROZEN);
+	ChangeCamera(camera_id, 1, 0);	//Change all player's view to the camera
+	
+	//Fade Out
+	fadeto(0, 0, 0, 1.0, 0.0);
+	fadeto(0, 0, 0, 1.0, 3.0);
+	
+	// Hide the regular HUD
+	TakeInventory("GrenadePickup", 9999); //let's remove grenades from BJ's inventory - ozy81
+	GiveInventory("CutsceneEnabled", 1);
+	
+	// Draw the background
+    SetHudSize(640, 480, true);
+    SetFont("MOVIEHD5");
+    HudMessage(s: "A"; HUDMSG_FADEINOUT, 990, CR_UNTRANSLATED, 320.0, 240.0, 9999.0, 0.0, 0.0);
+	
+	//Fade In
+	fadeto(0, 0, 0, 1.0, 0.0);
+	fadeto(0, 0, 0, 0.0, 5.0);
+	
+	//Douglas typewrites
+	ChangeCamera(30, 1, 0);	//Change all player's view to the camera
+	Thing_Activate(30);
+	ThingSound(37, "misc/typewriter", 90);
+	ACS_NamedExecute("LetterScroll", 0, 0, 0, 0);
+	delay(113*35);
+	
+	SetHudSize(480,320,true);
+			SetFont("BLACKBG");
+			hudmessagebold(s: "a"; HUDMSG_FADEINOUT,10,CR_WHITE,240.0,160.0,6.0,3.0,3.0);
+	delay(3*35);
+	ACS_NamedTerminate("LetterScroll", 0);
+	ACS_NamedExecute("CUTSCENE_MUSIC", 0, 0, 0, 0);
+	hudmessagebold(s:""; 0,992,-1,0,0,0);
+	ChangeCamera(camera_id, 1, 0);	//Change all player's view to the camera
+	delay(6*35);
+	
+
+	// Start with the broadcast
+	AmbientSound("RADIOBROADCAST_WAR", 64);
+	
+	Thing_Activate(camera_id);		//Activate moving camera
+	Thing_Activate(mover_id);		//Activate path follower
+	
+	// Start with the roll
+	delay(3*35);
+	ACS_Execute(3,0,0,0,0);
+	
+	// Start with the war
+	Thing_activate(21);
+	ACS_NamedExecute("RANDOM_LIGHT", 0, 0, 0, 0);	
+	ACS_NamedExecute("RANDOM_EXPLOSIONS", 0, 0, 0, 0);	
+}
+
+script "CUTSCENE_MUSIC" (void) // Delay music
+{
+	ACS_NamedExecuteAlways("SetMusicVolumeFactor", 0, 128, 3*35);
+	delay(3*35);
+	SetMusicVolume(1.0);
+	
+	setmusic("music/D_INTRMP.ogg");
+}
+
+script "RANDOM_LIGHT" (void)
+{
+	thing_activate(random(21,23));
+	delay(random(5,25));
+	thing_deactivate(21);
+	thing_deactivate(22);
+	thing_deactivate(23);
+	delay(random(35,70));
+	restart;	
+}
+
+script "RANDOM_EXPLOSIONS" (void)
+{
+	thing_activate(random(25,28));
+	delay(random(10,70));
+	restart;
+}
+
+int creditsroll_pos=0;
+
+str creditsroll[32][3]=	// Total amount of persons
+{
+	{"Core Team","in alphabetical order", "CRD_BK01"},
+	{"AFADoomer", "programming\n3d models", "CRD_BK02"},
+	{"DoomJedi\nBigDaveHadSomeToo", "sprite art", "CRD_BK03"},
+	{"Ed the Bat","programming\nactors\nquality control", "CRD_BK04"},
+	{"Doom Juan","level design\ndesign & plot conception\nsprite art directing\ntexture design", "CRD_BK05"},
+	{"GuardSoul","level design\nquality control", "CRD_BK06"},
+	{"Ozymandias81","model design\ndynamic light definition\nbrightmap definition\nsprites\nprogramming", "CRD_BK07"},
+	{"MaxEd","model design\nprogramming\ngraphic design\nquality control", "CRD_BK08"},
+	{"Nash","programming", "CRD_BK09"},
+	{"Tormentor667","project lead\nlevel design\ntexture and graphic design\nactor and sfx programming\ndesign and plot supervisor", "CRD_BK10"},
+		
+	{"Sources","material taken from", "CRD_BK31"},
+		
+	{"Music","Adrian von Ziegler\nBobby Prince\nDerek Fichter\nJohn Stafford\nMichael Giacchino\nScott Buckley", "CRD_BK11"},
+	{"Textures","Ceeb\nEnjay\nFuzzballFox\nLaz Rojas\nMagicWazard", "CRD_BK12"},
+	{"Sprites","Amv2k9 | Captain J | Cpt. Toenail | CeeJay \nDeadwolf | Enjay | Fox66 | Jazzmaster \nKronos | Laz Rojas | MagicWazard \nMajik Monkee | Mor'Ladim | PillowBlaster\nRaymoohawk | Soartex\nVader | The raukgzbber | Z86", "CRD_BK13"}, 
+	{"Graphics","B.J. Rowan\nBethesda\nCeeJay\nIdolFX\nMor'Ladim\nPeter Bark\nSidDoyle", "CRD_BK14"},
+	{"Decorate","MagicWazard\nPillowBlaster\nzrrion the insect", "CRD_BK15"},
+	{"Actors","Cpt. Toenail | DemonBreakMaster\nDr. Doctor | Espi\nGothic | Krispy\nMagicWazard | Mor'ladim\nPillowBlaster | Sgt. Mark IV\nLaz Rojas | Mancubus\nYouraofthehairfan", "CRD_BK16"}, 
+	{"Fonts","Laz Rojas\nJimmy91", "CRD_BK17"},
+	{"Special Effects","Cpt. Toenail\nKeksdose\nPillowblaster\nSolarsnowfall\nzrrion the insect", "CRD_BK18"},
+	{"Sounds","Bouncy\nJojikiba\nMcKinney", "CRD_BK19"},
+	{"Models","3dRegenerator\nEnjay\nLilWhiteMouse\nLou\nRex", "CRD_BK20"},
+	{"Scripts","Cocka\nHetdegon\nKodi\nThe Zombie Killer\nYqco", "CRD_BK21"},
+		
+	{"Based on work\nby Laz Rojas","WolfenDoom series\nof the late 90's", "CRD_BK22"},
+	{"Based on work\nby WildWeasel","Nazis weapons mod", "CRD_BK23"},
+		
+	{"Additional work","detailed information\nin the text file", "CRD_BK24"},
+		
+	{"Special Thanks","in alphabetical order", "CRD_BK25"},
+	{"MaxED","for GZDoomBuilder", "CRD_BK26"},
+	{"Gez","for SLADE", "CRD_BK32"},
+	{"Randy Heit","for the ZDoom\nsourceport", "CRD_BK27"},
+	{"Graf Zahl","for the GZDoom\nsourceport", "CRD_BK28"},
+	{"the Community","for priceless feedback\nand irreplaceable support", "CRD_BK29"},
+	{"You","for playing this mod", "CRD_BK30"}
+};
+
+script 3 (void) // Credits Roll
+{
+	sethudsize(640,480,true);
+	while(creditsroll_pos<=31)	// Total amount of persons
+	{
+		setfont("BIGFONT");
+		hudmessage(s:creditsroll[creditsroll_pos][0];
+			HUDMSG_FADEINOUT,971,CR_WHITE,320.4,225.2,3.0,1.0,1.0); //fixed a bit Y indentations, before it was 500.# - ozy81
+		setfont("SMALLFONT");
+		hudmessage(s:creditsroll[creditsroll_pos][1];
+			HUDMSG_FADEINOUT,972,CR_GRAY,320.4,225.1,3.0,1.0,1.0); //fixed a bit Y indentations, before it was 500.# - ozy81
+		setfont(creditsroll[creditsroll_pos][2]);
+		hudmessage(s:"a";
+			HUDMSG_FADEINOUT,973,CR_WHITE,320.0,240.0,1.0,2.0,2.0);
+		
+		delay(5*35);
+		creditsroll_pos++;
+		delay(1*35);
+	}
+}
+
+script 4 ENTER
+{
+	// Skip it?
+	SetHudSize(640, 480, true);
+	hudmessagebold(l: "INTROTEXGEN01"; HUDMSG_FADEINOUT,80,CR_GRAY,320.0,470.0,3.0,1.0,1.0);
+
+	int buttons;
+	int counter;
+	while (counter<315*35)
+	{
+		buttons = GetPlayerInput(-1,INPUT_BUTTONS);
+		if (buttons & BT_USE)
+		{
+			SetHudSize(480,320,true);
+			SetFont("BLACKBG");
+			hudmessagebold(s: "a"; HUDMSG_FADEINOUT,10,CR_WHITE,240.0,160.0,999.0,2.0,0.0);
+			delay(2*35);
+			SetPlayerProperty(1, 0, PROP_FROZEN);
+			// Show the regular HUD
+			TakeInventory("CutsceneEnabled", 1);
+			exit_normal(77);
+		}
+		delay(1);
+		counter++;
+	}
+	SetHudSize(480,320,true);
+	SetFont("BLACKBG");
+	hudmessagebold(s: "a"; HUDMSG_FADEINOUT,10,CR_WHITE,240.0,160.0,999.0,2.0,0.0);
+	delay(2*35);
+	SetPlayerProperty(1, 0, PROP_FROZEN);
+	// Show the regular HUD
+	TakeInventory("CutsceneEnabled", 1);
+	exit_normal(77);
+	
+}
+
+script "NoMap" OPEN
+{
+    SetHudSize(320, 200, true);
+    SetFont("blackbg");
+    HudMessage(s:"a"; HUDMSG_PLAIN | HUDMSG_NOTWITH3DVIEW | HUDMSG_LAYER_OVERMAP, 0, CR_UNTRANSLATED, 160.0, 100.0, 0);
+}
+
+script "LetterScroll" (void)
+{
+	sethudsize(960,600,1);
+	for(int y = 1600.0; y <= 1800.0; y -= 1.0)
+	{
+		setfont("DDB_LTTR");
+		hudmessagebold(s:"A"; 0,992,-1,480.0,y,0);
+		delay(2);
+	}
+}

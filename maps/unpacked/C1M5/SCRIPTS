@@ -1,0 +1,345 @@
+#include "zcommon.acs"
+
+int message_finished = 0;
+
+////////////////////
+// Health Display //
+////////////////////
+
+script 49 (void)
+{
+ thing_remove(118); //remove beach hedgehog
+	SetActorProperty(11,APROP_Health,1000);
+	ACS_NamedExecuteAlways("BossHealth",0,11,1000);
+}
+
+script 48 (void)
+{
+	SpawnSpotForced("GeneralExplosion",14,0,0);
+	SpawnSpotForced("JunkPile2",14,0,0);
+}
+
+//////////////////////
+// Objectives Setup //
+//////////////////////
+
+script "OBJECTIVES" OPEN
+{
+	//Set primary objectives
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,0,"MO_ICON_OPN");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,1,0,"MO_C1M5_P1");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,1,"MO_ICON_OPN");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,1,1,"MO_C1M5_P2");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,2,"MO_ICON_OPN");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,1,2,"MO_C1M5_P3");
+	//Set secondary objectives
+	ACS_NamedExecuteAlways("boaobjectivesset",0,1,3,"MO_C1M5_S1");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,3,"MO_ICON_OPN");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,1,4,"MO_C1M5_S2");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,4,"MO_ICON_OPN");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,1,5,"MO_C1M5_S2");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,5,"MO_ICON_OPN");
+}
+
+script 201 (void)
+{
+	//Sec Objective 1 solved
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,3,"MO_ICON_ACC");	
+	ACS_NamedExecuteAlways("boaobjectiveaccomplished",0,0,0,0);
+}
+
+script 202 (void)
+{
+	//Prim Objective 1 solved
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,0,"MO_ICON_ACC");	
+	ACS_NamedExecuteAlways("boaobjectiveaccomplished",0,0,0,0);
+}
+
+script 203 (void)
+{
+	//Sec Objective 2 solved
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,4,"MO_ICON_ACC");	
+	ACS_NamedExecuteAlways("boaobjectiveaccomplished",0,0,0,0);
+}
+
+script 204 (void)
+{
+	//Sec Objective 2 solved
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,1,"MO_ICON_ACC");	
+	ACS_NamedExecuteAlways("boaobjectiveaccomplished",0,0,0,0);
+}
+
+
+
+/////////////////////////////
+// Messages from Darren /////
+/////////////////////////////
+
+script 151 OPEN
+{
+
+  Sector_SetPlaneReflection(119,20,0);
+
+	delay(3*35);
+	ACS_NamedExecuteAlways("BoADialogue",0,"MS_DARR1","MS_DARR0","DARRENMESSAGE08");
+}
+
+script 152 (void)
+{
+	delay(3*35);
+	ACS_NamedExecuteAlways("BoADialogue",0,"MS_DARR1","MS_DARR0","DARRENMESSAGE09");
+	delay(5*35);
+
+	//Spawning Ammo & Stuff
+	spawnspot("Medikit_Medium",110);
+	spawnspot("9mmAmmoBox",112);
+	spawnspot("12GaugeAmmo",113);
+	
+	//Activate Exclamation marks at turrets
+	thing_activate(144);
+
+	ACS_Execute(49,0);
+	ACS_Execute(50,0);
+	ACS_Execute(51,0);
+}
+
+script 153 (void)
+{
+	SpawnSpotFacing("Marine1",107,209);
+	SpawnSpotFacing("Marine2",114,209);
+	SetActorProperty(209,APROP_Friendly,1);
+	SetActorProperty(209,APROP_Invulnerable,1);
+	thing_hate(209,50,4);
+	delay(4*35);
+	ACS_NamedExecuteAlways("BoADialogue",0,"MS_DARR1","MS_DARR0","DARRENMESSAGE10");
+	delay(5*35);
+	acs_execute(52,0);
+}
+
+script 154 (void)
+{
+	ACS_NamedExecuteAlways("BoADialogue",0,"MS_BARK1","MS_BARK0","BARKEEPERLIVE01");
+}
+
+
+////////////////////////////////
+// Equipment at mission start //
+////////////////////////////////
+
+script 188 ENTER
+{
+	GiveInventory("KnifeSilent",1);
+	GiveInventory("Walther9mm",1);
+	GiveInventory("9mmAmmo",32);
+	GiveInventory("Browning5",1);
+	GiveInventory("12GaugeAmmo",16);
+	SetWeapon("Browning5");
+}
+
+/////////////////////////////////
+// Remove eyes when being shot //
+/////////////////////////////////
+
+script 190 (void)
+{
+	SetLineTexture(163, SIDE_FRONT, TEXTURE_MIDDLE, "-");
+	ThingSound(164, "Nazi1/Death", 90);
+	Thing_Destroy(165, 0, 0);
+	SetLineSpecial(163, 0, 0, 0, 0, 0, 0);
+}
+
+/////////////////////////////////////
+// Open the Curtains in the casino //
+/////////////////////////////////////
+
+script 189 (void)
+{
+	//Start it only once
+	SetLineSpecial(79, 0, 0, 0, 0, 0, 0);
+	
+	Polyobj_Move(165, 5, 64, 32);
+	Polyobj_Move(168, 8, 64, 96);
+	Polyobj_Move(169, 11, 64, 160);
+	Polyobj_Move(170, 14, 64, 224);
+}
+
+/////////////////////////////
+// Attack Waves with Nazis //
+/////////////////////////////
+
+str enemytype[8] = {"WGuard","WMP40Guard","WGuard","WRifleGuard","WOfficer","SSGuard","WaffenSS","Paratrooper"};
+str boss_enemytype[4] = {"FlamerSoldier","SuperSoldier","SuperSoldierElite","SSTank1"};
+
+script 50 (void)
+{
+	for(int i=0;i < 8;i++)
+	{
+		SpawnSpotFacing(enemytype[i],12,50);
+		thing_hate(50,11,4);
+		Thing_SetGoal(50,13,0,1);
+		delay(5*35);
+	}
+	restart;
+}
+
+script 51 (void)
+{
+	for(int i=0;i < 4;i++)
+	{
+		SpawnSpotFacing(boss_enemytype[i],106,50);
+		thing_hate(50,11,4);
+		Thing_SetGoal(50,13,0,1);
+		delay(30*35);
+	}
+	delay(30*35);
+	acs_terminate(50,0);
+	SetActorProperty(11,APROP_Dormant,1);
+	acs_Terminate(49,0);
+	acs_execute(153,0,0,0,0);
+ }
+
+script 52 (void)
+{
+	while (thingcount(0,50))
+	{
+		delay(35);
+		HudMessage(s:"Defeat ",d:ThingCount(0,50),s:" more Krauts!";	HUDMSG_PLAIN,1,CR_RED,0.5,0.9,2.0);
+	}
+	//Sec Objective 3 solved
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,2,"MO_ICON_ACC");	
+	ACS_NamedExecuteAlways("boaobjectiveaccomplished",0,0,0,0);
+	delay(3*35);
+	Teleport_NewMap(99,0);
+}
+
+////////////////////////
+// Elevator to Cellar //
+////////////////////////
+
+bool elevatortop = TRUE;
+
+script 60 (void)
+{
+	SetLineActivation(123, SPAC_None);
+	
+	if(elevatortop)
+	{
+		Elevator_LowerToNearest(15,20);
+		Elevator_LowerToNearest(18,20);
+		delay(70);
+		TeleportInSector(15,16,17,0,0);
+		elevatortop = FALSE;
+		delay(4*35);
+		SetLineActivation(123, SPAC_Use);
+		terminate;
+	}
+	else
+	{
+		Elevator_RaiseToNearest(15,20);
+		Elevator_RaiseToNearest(18,20);
+		delay(70);
+		TeleportInSector(18,17,16,0,0);
+		elevatortop = TRUE;
+		delay(4*35);
+		SetLineActivation(123, SPAC_Use);
+		terminate;
+	}
+}
+
+///////////////////////////////
+// Elevator to Cellar in Bar //
+///////////////////////////////
+
+bool elevatortop2;
+
+script 61 (void)
+{
+	SetLineActivation(124, SPAC_None);
+	
+	if(elevatortop2)
+	{   Elevator_LowerToNearest(73,20);
+		Elevator_LowerToNearest(74,20);
+		delay(70);
+		TeleportInSector(73,75,76,0,0);
+		delay(4*35);
+		SetLineActivation(124, SPAC_Use);
+		elevatortop2 = FALSE;
+	}
+	else
+	{
+		Elevator_RaiseToNearest(73,20);
+		Elevator_RaiseToNearest(74,20);
+		delay(70);
+		TeleportInSector(74,76,75,0,0);
+		delay(4*35);
+		SetLineActivation(124, SPAC_Use);
+		elevatortop2 = TRUE;
+	}
+	
+}
+
+//Shoot Button, Door opens
+script 62 (void)
+{
+	thingsound(93,"DSMETDST",127);
+	thing_remove(93);
+	door_open(94,16,0);
+	thing_activate(95);
+}
+
+///////////////////////////
+//// Other Map Scripts ////
+///////////////////////////
+
+//Generic Light Script
+script 402 (int light_tid)
+{
+	if(!GetActorProperty(light_tid,APROP_Dormant))
+		Thing_Deactivate(light_tid);
+	else
+		Thing_Activate(light_tid);
+	PlaySound(0,"SW_LIGHT");
+}
+
+//Spark Spawner Script
+script 403 OPEN
+{
+	thing_activate(10);
+	delay(random(35,350));
+	restart;
+}
+
+//Generic vent breaker script
+script 404 (int vent_id)
+{
+	SetLineBlocking(vent_id,BLOCK_NOTHING);
+ SetLineTexture(vent_id, SIDE_FRONT, TEXTURE_MIDDLE, "VENT_M00");
+ SetLineTexture(vent_id, SIDE_BACK, TEXTURE_MIDDLE, "VENT_M00");
+}
+
+//Generic Flush Sound WC
+script 405 (int toilet_id)
+{
+	PlaySound(toilet_id,"toilet/flush",CHAN_BODY,1.0,0,0);
+}
+
+//Generic Mirror Script
+script 406 (int line_id)
+{
+	TranslucentLine(line_id,255);
+	GlassBreak(0);
+	SetLineTexture(line_id,SIDE_FRONT,TEXTURE_MIDDLE,"MIRR_W04");
+}
+
+//Generic Ladder Script
+script 407 (void)
+{
+    ThrustThingZ(0, 15, 0, 0);
+    ACS_NamedExecute("Laddersound", 0, 0, 0, 0);
+}
+
+script "Laddersound" (void)
+{
+    PlaySound (0, "world/ladder", CHAN_BODY, 0.71);
+    delay(15);
+}

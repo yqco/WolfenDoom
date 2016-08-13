@@ -1,0 +1,192 @@
+#include "zcommon.acs"
+
+/////////////////////////////
+//// Generic Map Scripts ////
+/////////////////////////////
+
+//Reflecting floor
+script 401 OPEN
+{
+    Sector_SetPlaneReflection(2, 30, 0);
+    Sector_SetFriction(2, 1.5);
+    //Sector_SetPlaneReflection(4, 30, 0);
+    Sector_SetFriction(4, 1.5);
+    //Sector_SetPlaneReflection(5, 30, 0);
+    Sector_SetFriction(5, 1.5);
+}
+
+//Generic Light Script
+script 402 (int light_tid)
+{
+	if(!GetActorProperty(light_tid,APROP_Dormant))
+		Thing_Deactivate(light_tid);
+	else
+		Thing_Activate(light_tid);
+	PlaySound(0,"SW_LIGHT");
+}
+
+//Spark Spawner Script
+script 403 OPEN
+{
+	thing_activate(10);
+ delay(5);
+	thing_deactivate(10);
+	delay(random(35,350));
+	restart;
+}
+
+//Generic vent breaker script
+script 404 (int vent_id)
+{
+	SetLineBlocking(vent_id,BLOCK_NOTHING);
+}
+
+//Generic Flush Sound WC
+script 405 (int toilet_id)
+{
+	PlaySound(toilet_id,"toilet/flush",CHAN_BODY,1.0,0,0);
+}
+
+//Generic Mirror Script
+script 406 (int line_id)
+{
+	TranslucentLine(line_id,255);
+	GlassBreak(0);
+	SetLineTexture(line_id,SIDE_FRONT,TEXTURE_MIDDLE,"MIRR_W04");
+}
+
+//Generic Ladder Script
+script 407 (void)
+{
+    ThrustThingZ(0, 15, 0, 0);
+    ACS_NamedExecute("Laddersound", 0, 0, 0, 0);
+}
+
+script "Laddersound" (void)
+{
+    PlaySound (0, "world/ladder", CHAN_BODY, 0.71);
+    delay(15);
+}
+
+////////////////
+// OBJECTIVES //
+////////////////
+
+script "OBJECTIVES" OPEN
+{
+	//Set primary objectives
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,0,"MO_ICON_OPN");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,1,0,"MO_C2M6A_P1");
+	//Set secondary objectives
+	ACS_NamedExecuteAlways("boaobjectivesset",0,1,3,"MO_C2M6A_S1");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,3,"MO_ICON_OPN");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,1,4,"MO_C2M6A_S2");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,4,"MO_ICON_OPN");
+}
+
+script 200 (void)
+{
+	//Prim Objective 1 solved
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,0,"MO_ICON_ACC");	
+	ACS_NamedExecuteAlways("boaobjectiveaccomplished",0,0,0,0);
+}
+
+script 203 (void)
+{
+	//Sec Objective 1 solved
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,3,"MO_ICON_ACC");	
+	ACS_NamedExecuteAlways("boaobjectiveaccomplished",0,0,0,0);
+}
+
+script 301 (void)
+{
+	//Darren tells you what to do
+	ACS_NamedExecuteAlways("BoADialogue",0,"MS_DARR1","MS_DARR0","DARRENMESSAGE41");
+	
+	//Make line useless
+	SetLineSpecial(85, 0, 0, 0, 0, 0, 0);
+	
+	delay(3*35);
+	
+	//Prim Objective 2 added
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,1,"MO_ICON_OPN");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,1,1,"MO_C2M6A_P2");
+	ACS_NamedExecuteAlways("boaobjectiveadded",0,0,0,0);
+}
+
+script 201 (void)
+{
+	//Prim Objective 2 solved
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,1,"MO_ICON_ACC");	
+	ACS_NamedExecuteAlways("boaobjectiveaccomplished",0,0,0,0);
+	
+	//Lower gates
+	Floor_LowerByValue(38, 16,128);
+}
+
+
+
+
+//////////////////////
+//// MAP SCRIPTS /////
+//////////////////////
+
+script 1 OPEN
+{
+	//Darren message incoming
+	delay(3*35);
+	ACS_NamedExecuteAlways("BoADialogue",0,"MS_DARR1","MS_DARR0","DARRENMESSAGE39");
+}
+
+script 2 (void)
+{
+	//Darren Message when collecting files
+	delay(1*35);
+	ACS_NamedExecuteAlways("BoADialogue",0,"MS_DARR1","MS_DARR0","DARRENMESSAGE40");
+}
+
+script 9 ENTER
+{
+        GiveInventory("Browning5",1);
+        GiveInventory("12GaugeAmmo",8);
+        GiveInventory("Luger9mm",1);
+        GiveInventory("9mmAmmo",24);
+        GiveInventory("KnifeSilent",1);
+        SetWeapon("Browning5");
+}
+
+script 10 (void)
+{
+    thing_remove(22);
+    floor_lowertolowest(23, 10);
+    thing_activate(30);
+    spawnspotfacing("Paratrooper", 75, 0);
+    spawnspotfacing("GermanShepherd", 76, 0);
+}
+
+script "IceWater" OPEN
+{
+        SectorDamage(39, 10, "IceWater", "", DAMAGE_PLAYERS);
+        delay(70);
+        restart;
+}
+
+//Open gate near "lager" and prepare trap
+script 11 (void)
+{
+    door_open(58, 10, 0);
+    delay(35);
+    door_open(61, 10, 0);
+}
+
+//Spawn Gretel Grosse
+script 12 (void)
+{
+    spawnspotfacing("SuperSoldier", 65, 0);
+}
+
+//Spawn Soldiers
+script 13 (void)
+{
+    spawnspotfacing("WGuard", 66, 0);
+}

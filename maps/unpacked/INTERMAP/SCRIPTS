@@ -1,0 +1,998 @@
+#include "zcommon.acs"
+
+global int 6:mission_number;		//The variable for the mission number
+int briefing_seen;		//The variable that checks if the briefing has been watched or not
+int daytime_intermap;	//The variable for the daytime
+int briefing_in_progress; //mxd. Stops Miller's idle chatter when showing a briefing
+//Secret mission variables
+int eisenmann_akten,eisenmann_active,astrostein_artifact,astrostein_active;
+
+// Talon1024 - Allow player to retain grenades he had before starting the training course. (If he bought some from the shop)
+int num_grenades[4]; // Array because co-op players.
+
+//The Intermap loads for the first time, set up everything
+script "OPEN INTERMAP" OPEN
+{
+	//First Douglas message
+	ACS_NamedExecuteAlways("BoADialogue",0,"MS_DARR1","MS_DARR0","DARRENMESSAGE49");
+	
+	//Patrol points
+	Thing_SetGoal(21, 23, 0, 0);
+	Thing_SetGoal(20, 26, 0, 0);
+	Thing_SetGoal(38, 35, 0, 0);
+
+	//Deactivate exclamation mark from Dirty Darren (Map Exit)
+	thing_deactivate(7); //ozy:
+	//mxd. Turn on chandelieres in the mess hall
+	Thing_Activate(27);
+
+	//mxd. Start idle chatter
+	ACS_NamedExecute("MillerChatter",0);
+	ACS_NamedExecute("NashChatter",0);
+	ACS_NamedExecute("PaddockChatter",0);
+
+	//Initialize Professor Gutenberg in case we're starting ahead
+	ACS_NamedExecute("GutenbergDialogue",0);
+	
+	// Make training weapons undroppable
+	GiveActorInventory(110, "MakeUndroppable", 1); // walther
+	GiveActorInventory(111, "MakeUndroppable", 1); // karabiner98k
+	GiveActorInventory(112, "MakeUndroppable", 1); // panzerschreck
+
+	daytime_intermap=1;
+	delay(35*2);
+
+	//printbold(s:"\cCType ''PUKENAME MISSION X'' where X is the mission you want to play"); //remove when done
+}
+script "ENTER INTERMAP" ENTER
+{
+	//Clear inventory for the first time - No need to add grenades anymore, removed from BJ inventory instead (ozy))
+	ACS_NamedExecute("CLEAR INVENTORY", 0);
+	TakeInventory("MineSweeper", 1);
+	GiveInventory("HQ_Checker", 1);
+}
+
+//The Player returns to the Intermap after his missions
+script "RETURN INTERMAP" RETURN
+{
+	FadeRange (0,0,0,1.0,0,0,0,0.0,2.5);
+	GiveInventory("HQ_Checker", 1);
+	daytime_intermap++; //change the Daytime
+
+	if(daytime_intermap==1)
+	{
+		sector_setcolor(8, 214, 222, 194);sector_setcolor(14, 214, 222, 194);sector_setcolor(118, 214, 222, 194);sector_setcolor(119, 214, 222, 194);
+		sector_setcolor(15, 214, 222, 194);sector_setcolor(16, 214, 222, 194);sector_setcolor(88, 214, 222, 194);
+		sector_setfade(8, 0, 0, 0);sector_setfade(14, 0, 0, 0);sector_setfade(118, 0, 0, 0);sector_setfade(119, 0, 0, 0);
+		sector_setfade(15, 0, 0, 0);sector_setfade(16, 0, 0, 0);sector_setfade(88, 0, 0, 0);
+		thing_move(9, 10, 1);
+	}
+	else if(daytime_intermap==2)
+	{
+		sector_setcolor(8, 148, 172, 197);sector_setcolor(14, 148, 172, 197);sector_setcolor(118, 148, 172, 197);sector_setcolor(119, 148, 172, 197);
+		sector_setcolor(15, 148, 172, 197);sector_setcolor(16, 148, 172, 197);sector_setcolor(88, 148, 172, 197);
+		sector_setfade(8, 0, 0, 0);sector_setfade(14, 0, 0, 0);sector_setfade(118, 0, 0, 0);sector_setfade(119, 0, 0, 0);
+		sector_setfade(15, 0, 0, 0);sector_setfade(16, 0, 0, 0);sector_setfade(88, 0, 0, 0);
+		thing_move(9, 11, 1);
+	}
+	else if(daytime_intermap==3)
+	{
+		sector_setcolor(8, 196, 165, 201);sector_setcolor(14, 196, 165, 201);sector_setcolor(118, 196, 165, 201);sector_setcolor(119, 196, 165, 201);
+		sector_setcolor(15, 196, 165, 201);sector_setcolor(16, 196, 165, 201);sector_setcolor(88, 196, 165, 201);
+		sector_setfade(8, 0, 0, 0);sector_setfade(14, 0, 0, 0);sector_setfade(118, 0, 0, 0);sector_setfade(119, 0, 0, 0);
+		sector_setfade(15, 0, 0, 0);sector_setfade(16, 0, 0, 0);sector_setfade(88, 0, 0, 0);
+		thing_move(9, 12, 1);
+	}
+	else if(daytime_intermap==4)
+	{
+		sector_setcolor(8, 255, 255, 255);sector_setcolor(14, 255, 255, 255);sector_setcolor(118, 255, 255, 255);sector_setcolor(119, 255, 255, 255);
+		sector_setcolor(15, 255, 255, 255);sector_setcolor(16, 255, 255, 255);sector_setcolor(88, 255, 255, 255);
+		sector_setfade(8, 177, 177, 182);sector_setfade(14, 177, 177, 182);sector_setfade(118, 177, 177, 182);sector_setfade(119, 177, 177, 182);
+		sector_setfade(15, 177, 177, 182);sector_setfade(16, 177, 177, 182);sector_setfade(88, 177, 177, 182);
+		thing_move(9, 13, 1);
+	}
+ else if(daytime_intermap==5)
+	{
+		sector_setcolor(8, 255, 230, 230);sector_setcolor(14, 255, 230, 230);sector_setcolor(118, 255, 230, 230);sector_setcolor(119, 255, 230, 230);
+		sector_setcolor(15, 255, 230, 230);sector_setcolor(16, 255, 230, 230);sector_setcolor(88, 255, 230, 230);
+		sector_setfade(8, 0, 0, 0);sector_setfade(14, 0, 0, 0);sector_setfade(118, 0, 0, 0);sector_setfade(119, 0, 0, 0);
+		sector_setfade(15, 0, 0, 0);sector_setfade(16, 0, 0, 0);sector_setfade(88, 0, 0, 0);
+		thing_move(9, 16, 1);
+	}
+ else if(daytime_intermap>=6)
+	{
+		sector_setcolor(8, 80, 90, 100);sector_setcolor(14, 80, 90, 100);sector_setcolor(118, 80, 90, 100);sector_setcolor(119, 80, 90, 100);
+		sector_setcolor(15, 280, 90, 100);sector_setcolor(16, 80, 90, 100);sector_setcolor(88, 80, 90, 100);
+		sector_setfade(8, 0, 0, 0);sector_setfade(14, 0, 0, 0);sector_setfade(118, 0, 0, 0);sector_setfade(119, 0, 0, 0);
+		sector_setfade(15, 0, 0, 0);sector_setfade(16, 0, 0, 0);sector_setfade(88, 0, 0, 0);
+		thing_move(9, 55, 1);
+		daytime_intermap=0;
+	}
+
+	ACS_NamedExecute("CLEAR INVENTORY", 0);
+	ACS_NamedExecute("NPCDialogue", 0);	
+	ACS_NamedExecute("JamesRyanState", 0);		
+	ACS_NamedExecute("GutenbergDialogue",0);
+	ACS_NamedExecute("MarleneDietrich", 0);
+}
+
+script "MarleneDietrich" (void) //T667. MarleneDietrich randomizer
+{
+	if(random(0,2)==1)
+	{
+		thing_activate(51);
+		thing_deactivate(54);
+		setmusic("");
+		SpawnSpotFacingForced("Marine3AStatist", 52, 990);
+		SpawnSpotFacingForced("Marine3BStatist", 53, 990);
+		delay(1);
+	}
+	else
+	{
+		thing_activate(54);
+		thing_deactivate(51);
+		thing_remove(990);
+		setmusic("BRIEFING");
+	}
+}
+
+script "Thunderstorm" RETURN
+{
+	delay(5);
+    while(daytime_intermap==0)
+    {
+        thing_activate(57); //Howling wind
+        thing_activate(56); //Lightning
+        delay(random(15,40));
+        thing_deactivate(56);
+        delay(random(2,4)*35);
+        AmbientSound("misc/thunder", 127); //Thunder sound
+        delay(random(10,20)*35);
+    }
+    thing_deactivate(56);
+    thing_deactivate(57); //Howling wind deactivated if not needed
+}
+
+//mxd. Miller's random chatter
+script "MillerChatter" RETURN
+{
+	delay(35 * random(20, 60));
+	if(!briefing_in_progress)
+		ThingSound(28, "miller/idle", 127);
+	restart;
+}
+
+//mxd. Nash's random chatter
+script "NashChatter" RETURN
+{
+	delay(35 * random(20, 60));
+	ThingSound(49, "allied2/idle", 127);
+	restart;
+}
+
+//mxd. Paddock's random chatter
+script "PaddockChatter" RETURN
+{
+	delay(35 * random(20, 60));
+	ThingSound(50, "allied1/idle", 127);
+	restart;
+}
+
+//Update NPC dialogues according to the mission
+script "NPCDialogue" (void)
+{
+	//Activate exclamation mark from General Miller before each briefing
+	thing_activate(6); 
+	
+	//Activate exclamation mark from Ty Haldermann (health)
+	if(GetActorProperty(0, APROP_Health)<100)
+	{
+		thing_activate(97);
+	}
+	
+	//Activate exclamation mark from Dr. Gutenberg if you have Eisenmann files or Astrostein Artifacts
+	if(CheckInventory("AktenEisenmann")>0 || CheckInventory("ArtifactAstrostrein")>0)
+	{
+		thing_activate(98);
+	}
+	
+	//Activate exclamation mark from NES if you have new cartridges
+	if(CheckInventory("Cartridge51")>0 || CheckInventory("Cartridge52")>0 || CheckInventory("Cartridge52")>0)
+	{
+		thing_activate(100); 
+	}
+	
+	//Activate Sgt. Ascher's Dialogue before C1M2
+	if(mission_number==1)
+	{
+		thing_move(103, 104, 1);
+		Thing_SetConversation(104, 231);
+	}
+	
+	//Activate Sgt. Ascher's Dialogue before C1M4
+	if(mission_number==3)
+	{
+		thing_activate(103);
+		Thing_SetConversation(104, 232);
+	}
+	
+	//Update Juliette Shotglass dialogue before C1M5 in France starts
+	if(mission_number==4)
+	{
+		thing_activate(101);
+		Thing_SetConversation(102, 95);
+	}
+	
+	//Update Juliette Shotglass dialogue before C1M6 in France starts
+	if(mission_number==5)
+	{
+		thing_activate(101);
+		Thing_SetConversation(102, 96);
+	}
+	
+	//Replace Douglas with Sgt. Ascher before C3M1
+	if(mission_number==12)
+	{
+		thing_remove(105);
+		thing_remove(103);
+		thing_move(104, 106, 1);
+		SetActorAngle(104, 0.75);
+	}
+}
+
+script "JamesRyanState" (void)
+{
+	//Move Agent Ryan into the lobby as soon as he is freed
+	if(mission_number>=2 && mission_number<12)
+	{
+		thing_move(17, 18, 1); 
+		thing_move(43, 18, 1);
+	}
+	
+	//Move Agent Ryan out of the lobby as soon as he has betrayed you
+	if(mission_number>=12)
+	{
+		thing_move(17, 96, 1); 
+		thing_move(43, 96, 1);
+	}
+}
+
+//Set Prof. Gutenberg's dialogue
+script "GutenbergDialogue" (void)
+{
+	if(mission_number>=7)
+	{
+		if(eisenmann_akten>=5&&astrostein_artifact>=5)
+			{
+			Thing_SetConversation(48,9);	//Gutenberg: Eisenmann and Astrostein are both complete
+			Thing_SetConversation(15,31); 
+			Thing_Activate(99);				//Activate Laz Rojas exclamation mark for super armor
+			}
+		else if(eisenmann_akten>=5)
+			{
+			Thing_SetConversation(48,7);	//Gutenberg: Eisenmann is complete, but Astrostein is incomplete
+			Thing_SetConversation(15,30); 
+			}
+		else if(astrostein_artifact>=5)
+			{
+			Thing_SetConversation(48,8);	//Gutenberg: Eisenmann is incomplete, but Astrostein is complete
+			Thing_SetConversation(15,31); 
+			Thing_Activate(99);				//Activate Laz Rojas exclamation mark for super armor
+			}
+		else
+			{
+			Thing_SetConversation(48,6);	//Gutenberg: Eisenmann and Astrostein are both incomplete
+			Thing_SetConversation(15,30); 
+			}
+	}
+	else
+	{
+		if(eisenmann_akten>=5)
+			Thing_SetConversation(48,5);	//Gutenberg: Eisenmann is complete
+		else
+			Thing_SetConversation(48,4);	//Gutenberg: Eisenmann is incomplete
+	}
+}
+
+script "MISSION" (int x)
+{
+	//Activate exclamation mark from General Miller (Briefing)
+	thing_activate (6);
+	if(x==19)
+	{
+		printbold(s:"\cCSecret Mission 1 is now active");
+		eisenmann_active=1;
+	}
+	else if(x==20)
+	{
+		printbold(s:"\cCSecret Mission 2 is now active");
+		astrostein_active=1;
+	}
+	else if(x>0)
+	{
+		printbold(s:"\cCMission ",d:x,s:"\cC is now active");
+		mission_number=x-1;
+	}
+	//If no variable, just report the current status
+	else if(eisenmann_active)
+		printbold(s:"\cCSecret Mission 1 is now active");
+	else if(astrostein_active)
+		printbold(s:"\cCSecret Mission 2 is now active");
+	else
+		printbold(s:"\cCMission ",d:mission_number+1,s:"\cC is now active");
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////// Briefing Texts /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+str briefing_content[21][7][3] =
+{
+	{
+		//mxd. Projector texture name, sound name, text
+		{"C1M1_1","C1M1_1","BRIEFINGC1M1_1"},
+		{"C1M1_2","C1M1_2","BRIEFINGC1M1_2"},
+		{"C1M1_3","C1M1_3","BRIEFINGC1M1_3"},
+		{"C1M1_4","C1M1_4","BRIEFINGC1M1_4"},
+		{"C1M1_1","C1M1_5","BRIEFINGC1M1_5"},
+		{"","","BRIEFINGC1M1_6"},
+		{"","","BRIEFINGC1M1_7"},
+	},
+	{
+		{"C1M2_1","C1M2_1","BRIEFINGC1M2_1"},
+		{"C1M2_2","C1M2_2","BRIEFINGC1M2_2"},
+		{"C1M2_3","C1M2_3","BRIEFINGC1M2_3"},
+		{"C1M2_4","C1M2_4","BRIEFINGC1M2_4"},
+		{"C1M2_1","C1M2_5","BRIEFINGC1M2_5"},
+		{"","","BRIEFINGC1M2_6"},
+		{"","","BRIEFINGC1M2_7"},
+	},
+	{
+		{"C1M3_1","C1M3_1","BRIEFINGC1M3_1"},
+		{"C1M3_2","C1M3_2","BRIEFINGC1M3_2"},
+		{"C1M3_3","C1M3_3","BRIEFINGC1M3_3"},
+		{"C1M3_4","C1M3_4","BRIEFINGC1M3_4"},
+		{"C1M3_1","C1M3_5","BRIEFINGC1M3_5"},
+		{"","","BRIEFINGC1M3_6"},
+		{"","","BRIEFINGC1M3_7"},
+	},
+	{
+		{"C1M4_1","C1M4_1","BRIEFINGC1M4_1"},
+		{"C1M4_2","C1M4_2","BRIEFINGC1M4_2"},
+		{"C1M4_3","C1M4_3","BRIEFINGC1M4_3"},
+		{"C1M4_4","C1M4_4","BRIEFINGC1M4_4"},
+		{"C1M4_1","C1M4_5","BRIEFINGC1M4_5"},
+		{"","","BRIEFINGC1M4_6"},
+		{"","","BRIEFINGC1M4_7"},
+	},
+	{
+		{"C1M5_1","C1M5_1","BRIEFINGC1M5_1"},
+		{"C1M5_2","C1M5_2","BRIEFINGC1M5_2"},
+		{"C1M5_3","C1M5_3","BRIEFINGC1M5_3"},
+		{"C1M5_4","C1M5_4","BRIEFINGC1M5_4"},
+		{"C1M5_1","C1M5_5","BRIEFINGC1M5_5"},
+		{"","","BRIEFINGC1M5_6"},
+		{"","","BRIEFINGC1M5_7"},
+	},
+	{
+		{"C1M6_1","C1M6_1","BRIEFINGC1M6_1"},
+		{"C1M6_2","C1M6_2","BRIEFINGC1M6_2"},
+		{"C1M6_3","C1M6_3","BRIEFINGC1M6_3"},
+		{"C1M6_4","C1M6_4","BRIEFINGC1M6_4"},
+		{"C1M6_1","C1M6_5","BRIEFINGC1M6_5"},
+		{"","","BRIEFINGC1M6_6"},
+		{"","","BRIEFINGC1M6_7"},
+	},
+	{
+		{"C2M1_1","C2M1_1","BRIEFINGC2M1_1"},
+		{"C2M1_2","C2M1_2","BRIEFINGC2M1_2"},
+		{"C2M1_3","C2M1_3","BRIEFINGC2M1_3"},
+		{"C2M1_4","C2M1_4","BRIEFINGC2M1_4"},
+		{"C2M1_1","C2M1_5","BRIEFINGC2M1_5"},
+		{"","","BRIEFINGC2M1_6"},
+		{"","","BRIEFINGC2M1_7"},
+	},
+	{
+		{"C2M2_1","","BRIEFINGC2M2_1"},
+		{"C2M2_2","","BRIEFINGC2M2_2"},
+		{"C2M2_3","","BRIEFINGC2M2_3"},
+		{"C2M2_4","","BRIEFINGC2M2_4"},
+		{"C2M2_1","","BRIEFINGC2M2_5"},
+		{"","","BRIEFINGC2M2_6"},
+		{"","","BRIEFINGC2M2_7"},
+	},
+	{
+		{"C2M3_1","","BRIEFINGC2M3_1"},
+		{"C2M3_2","","BRIEFINGC2M3_2"},
+		{"C2M3_3","","BRIEFINGC2M3_3"},
+		{"C2M3_4","","BRIEFINGC2M3_4"},
+		{"C2M3_1","","BRIEFINGC2M3_5"},
+		{"","","BRIEFINGC2M3_6"},
+		{"","","BRIEFINGC2M3_7"},
+	},
+	{
+		{"C2M4_1","","BRIEFINGC2M4_1"},
+		{"C2M4_2","","BRIEFINGC2M4_2"},
+		{"C2M4_3","","BRIEFINGC2M4_3"},
+		{"C2M4_4","","BRIEFINGC2M4_4"},
+		{"C2M4_1","","BRIEFINGC2M4_5"},
+		{"","","BRIEFINGC2M4_6"},
+		{"","","BRIEFINGC2M4_7"},
+	},
+	{
+		{"C2M5_1","","BRIEFINGC2M5_1"},
+		{"C2M5_2","","BRIEFINGC2M5_2"},
+		{"C2M5_3","","BRIEFINGC2M5_3"},
+		{"C2M5_4","","BRIEFINGC2M5_4"},
+		{"C2M5_1","","BRIEFINGC2M5_5"},
+		{"","","BRIEFINGC2M5_6"},
+		{"","","BRIEFINGC2M5_7"},
+	},
+	{
+		{"C2M6_1","","BRIEFINGC2M6_1"},
+		{"C2M6_2","","BRIEFINGC2M6_2"},
+		{"C2M6_3","","BRIEFINGC2M6_3"},
+		{"C2M6_4","","BRIEFINGC2M6_4"},
+		{"C2M6_1","","BRIEFINGC2M6_5"},
+		{"","","BRIEFINGC2M6_6"},
+		{"","","BRIEFINGC2M6_7"},
+	},
+	{
+		{"C3M1_1","C3M1_1","BRIEFINGC3M1_1"},
+		{"C3M1_2","C3M1_2","BRIEFINGC3M1_2"},
+		{"C3M1_3","C3M1_3","BRIEFINGC3M1_3"},
+		{"C3M1_4","C3M1_4","BRIEFINGC3M1_4"},
+		{"C3M1_1","C3M1_5","BRIEFINGC3M1_5"},
+		{"","","BRIEFINGC3M1_6"},
+		{"","","BRIEFINGC3M1_7"},
+	},
+	{
+		{"C3M2_1","","BRIEFINGC3M2_1"},
+		{"C3M2_2","","BRIEFINGC3M2_2"},
+		{"C3M2_3","","BRIEFINGC3M2_3"},
+		{"C3M2_4","","BRIEFINGC3M2_4"},
+		{"C3M2_1","","BRIEFINGC3M2_5"},
+		{"","","BRIEFINGC3M2_6"},
+		{"","","BRIEFINGC3M2_7"},
+	},
+	{
+		{"C3M3_1","","BRIEFINGC3M3_1"},
+		{"C3M3_2","","BRIEFINGC3M3_2"},
+		{"C3M3_3","","BRIEFINGC3M3_3"},
+		{"C3M3_4","","BRIEFINGC3M3_4"},
+		{"C3M3_1","","BRIEFINGC3M3_5"},
+		{"","","BRIEFINGC3M3_6"},
+		{"","","BRIEFINGC3M3_7"},
+	},
+	{
+		{"C3M4_1","","BRIEFINGC3M4_1"},
+		{"C3M4_2","","BRIEFINGC3M4_2"},
+		{"C3M4_3","","BRIEFINGC3M4_3"},
+		{"C3M4_4","","BRIEFINGC3M4_4"},
+		{"C3M4_1","","BRIEFINGC3M4_5"},
+		{"","","BRIEFINGC3M4_6"},
+		{"","","BRIEFINGC3M4_7"},
+	},
+	{
+		{"C3M5_1","","BRIEFINGC3M5_1"},
+		{"C3M5_2","","BRIEFINGC3M5_2"},
+		{"C3M5_3","","BRIEFINGC3M5_3"},
+		{"C3M5_4","","BRIEFINGC3M5_4"},
+		{"C3M5_1","","BRIEFINGC3M5_5"},
+		{"","","BRIEFINGC3M5_6"},
+		{"","","BRIEFINGC3M5_7"},
+	},
+	{
+		{"C3M6_1","","BRIEFINGC3M6_1"},
+		{"C3M6_2","","BRIEFINGC3M6_2"},
+		{"C3M6_3","","BRIEFINGC3M6_3"},
+		{"C3M6_4","","BRIEFINGC3M6_4"},
+		{"C3M6_1","","BRIEFINGC3M6_5"},
+		{"","","BRIEFINGC3M6_6"},
+		{"","","BRIEFINGC3M6_7"},
+	},
+	//Operation: Eisenmann briefing
+	{
+		{"C1M0_1","C1M0_1","BRIEFINGC1M0_1"},
+		{"C1M0_2","C1M0_2","BRIEFINGC1M0_2"},
+		{"C1M0_3","C1M0_3","BRIEFINGC1M0_3"},
+		{"C1M0_4","C1M0_4","BRIEFINGC1M0_4"},
+		{"C1M0_1","C1M0_5","BRIEFINGC1M0_5"},
+		{"","","BRIEFINGC1M0_6"},
+		{"","","BRIEFINGC1M0_7"},
+	},
+	//Operation: Astrostein briefing
+	{
+		{"C2M0_1","C2M0_1","BRIEFINGC2M0_1"},
+		{"C2M0_2","C2M0_2","BRIEFINGC2M0_2"},
+		{"C2M0_3","C2M0_3","BRIEFINGC2M0_3"},
+		{"C2M0_4","C2M0_4","BRIEFINGC2M0_4"},
+		{"C2M0_1","C2M0_5","BRIEFINGC2M0_5"},
+		{"","","BRIEFINGC2M0_6"},
+		{"","","BRIEFINGC2M0_7"},
+	},
+	//C3 Secret Mission briefing
+	{
+		{"C3M0_1","C3M0_1","BRIEFINGC3M0_1"},
+		{"C3M0_2","C3M0_2","BRIEFINGC3M0_2"},
+		{"C3M0_3","C3M0_3","BRIEFINGC3M0_3"},
+		{"C3M0_4","C3M0_4","BRIEFINGC3M0_4"},
+		{"C3M0_1","C3M0_5","BRIEFINGC3M0_5"},
+		{"","","BRIEFINGC3M0_6"},
+		{"","","BRIEFINGC3M0_7"},
+	}
+};
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//// Briefing Script ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+int briefing_pos,skip_allowed,skipping;
+str intro_beep[3] = {"MOVI_C03","MOVI_C02","MOVI_C01"};
+script 101 (void)
+{
+	skipping=0;
+	briefing_pos=0; //Make sure we start at the beginning of each briefing
+	briefing_in_progress = true; //mxd
+
+	//Deactivate exclamation mark from General Miller (Briefing)
+	thing_deactivate(6); //ozy
+	ACS_NamedExecuteAlways("SetMusicVolumeFactor", 0, 128, 70); //T667 sets the music to half volume when briefing is running in two seconds
+	Thing_SetConversation(28, 0); //mxd. We souldn't be able to talk to Miller while the briefing is running
+	Thing_SetConversation(48, 10); //Prof. Gutenberg won't talk much once a mission is accepted
+
+	for(int i=0;i<3;i++)
+	{
+		TranslucentLine(2,0,1);
+		SetLineTexture(1,SIDE_FRONT,TEXTURE_MIDDLE,"BLACK");
+		Thing_Deactivate(1);
+		delay(10);
+		ThingSound(3,"DIA_BEEP",80);
+		SetLineTexture(1,SIDE_FRONT,TEXTURE_MIDDLE,intro_beep[i]);
+		TranslucentLine(2,255,1);
+		Thing_activate(1);
+		delay(25);
+	}
+
+	SetHudSize(320,200,1);
+	SetFont("HEADBAR");
+	hudmessagebold(s:"A"; HUDMSG_FADEINOUT,4,CR_UNTRANSLATED,160.0,24.0,999.0,2.0,999.0);
+	SetFont("MS_GENR1");
+	hudmessagebold(s:"A"; HUDMSG_FADEINOUT,3,CR_UNTRANSLATED,21.0,16.0,999.0,2.0,999.0);
+	SetFont("HEADBOVL"); //mxd. Frame overlay
+	hudmessagebold(s:"A"; HUDMSG_FADEINOUT,1,CR_UNTRANSLATED,160.0,24.0,999.0,2.0,999.0); //mxd
+
+	while(briefing_pos<5)
+	{
+		//Diashow
+		ThingSound(3,"DIA_SLID",80);
+		SetLineTexture(1,SIDE_FRONT,TEXTURE_MIDDLE,"BLACK");
+		TranslucentLine(2,0,1);
+		Thing_Deactivate(1);
+		delay(30);
+		int briefing_number=mission_number;
+		if(eisenmann_active)
+			briefing_number=18;
+		else if(astrostein_active)
+			briefing_number=19;
+		SetLineTexture(1,SIDE_FRONT,TEXTURE_MIDDLE,briefing_content[briefing_number][briefing_pos][0]);
+		TranslucentLine(2,255,1);
+		Thing_Activate(1);
+
+		//Briefing Text
+		SetHudSize(640,400,1);
+		SetHudWrapWidth(540);
+		SetFont("SMALLFONT");
+		hudmessagebold(s:StrParam(s:"\cpGeneral Miller\n",l:briefing_content[briefing_number][briefing_pos][2]); HUDMSG_TYPEON,2,CR_GRAY,100.1,8.1,5.0,0.01);
+		PlaySound(28, briefing_content[briefing_number][briefing_pos][1], CHAN_BODY, 1.0, false, ATTN_NONE); //mxd
+		delay(3*35);
+		skip_allowed=1;
+		hudmessagebold(s:StrParam(s:"\cpGeneral Miller\n",l:briefing_content[briefing_number][briefing_pos][2]); HUDMSG_PLAIN,2,CR_GRAY,100.1,8.1,0);
+		hudmessagebold(l:"BRIEFINGGEN01",k:"+use",l:"BRIEFINGGEN02"; HUDMSG_PLAIN,5,CR_GOLD,320.0,100.0,0);
+		while(!skipping)
+			delay(1);
+		hudmessagebold(s:""; HUDMSG_PLAIN,2,CR_UNTRANSLATED,0,0,0.1);
+		hudmessagebold(s:""; HUDMSG_PLAIN,5,CR_UNTRANSLATED,0,0,0.1);
+		skipping=0;
+		skip_allowed=0;
+		briefing_pos++;
+	}
+	skip_allowed=0;
+	SetLineTexture(1,SIDE_FRONT,TEXTURE_MIDDLE,"BLACK");
+	TranslucentLine(2,0,1);
+	Thing_Deactivate(1);
+	Thing_SetConversation(28, 3); //mxd. Make Miller talky.
+
+	//Fadeout
+	hudmessagebold(s:""; HUDMSG_PLAIN,2,CR_UNTRANSLATED,0,0,0.1);
+	SetHudSize(320,200,1);
+	SetFont("HEADBAR");
+	hudmessagebold(s:"A"; HUDMSG_FADEINOUT,4,CR_UNTRANSLATED,160.0,24.0,0,0,2.0);
+	SetFont("MS_GENR1");
+	hudmessagebold(s:"A"; HUDMSG_FADEINOUT,3,CR_UNTRANSLATED,21.0,16.0,0,0,2.0);
+	SetFont("HEADBOVL"); //mxd
+	hudmessagebold(s:"A"; HUDMSG_FADEINOUT,1,CR_UNTRANSLATED,160.0,24.0,0,0,2.0); //mxd
+	//Activate Exclamation mark from Dirty Darren (Map Exit)
+	thing_activate(7); //ozy
+	briefing_seen=1; //Briefing is seen, tag it now
+	briefing_in_progress = false; //mxd
+	ACS_NamedExecuteAlways("SetMusicVolumeFactor", 0, 256, 70); //T667 sets the music to full volume when briefing is done in two seconds
+}
+
+//Dirty Darren takes you to the next mission only if you have watched the briefing
+script 5 (void)
+{
+	if(!briefing_seen)
+		terminate;
+	SetHudSize(320,200,1);
+	SetFont("HEADBAR");
+	hudmessagebold(s:"A"; HUDMSG_FADEINOUT,4,CR_UNTRANSLATED,160.0,24.0,999.0,2.0,999.0);
+	SetFont("MS_DARR1");
+	hudmessagebold(s:"A"; HUDMSG_FADEINOUT,3,CR_UNTRANSLATED,21.0,16.0,999.0,2.0,999.0);
+	SetFont("HEADBOVL"); //mxd. Frame overlay
+	hudmessagebold(s:"A"; HUDMSG_FADEINOUT,1,CR_UNTRANSLATED,160.0,24.0,999.0,2.0,999.0); //mxd
+	while(briefing_pos<7)
+	{
+		//Briefing Text
+		SetHudSize(640,400,1);
+		SetHudWrapWidth(540);
+		SetFont("SMALLFONT");
+		int briefing_number=mission_number;
+		if(eisenmann_active)
+			briefing_number=18;
+		else if(astrostein_active)
+			briefing_number=19;
+		hudmessagebold(s:StrParam(s:"\cEDirty Douglas\n",l:briefing_content[briefing_number][briefing_pos][2]); HUDMSG_TYPEON,2,CR_GRAY,100.1,8.1,5.0,0.01);
+		delay(3*35);
+		skip_allowed=1;
+		hudmessagebold(s:StrParam(s:"\cEDirty Douglas\n",l:briefing_content[briefing_number][briefing_pos][2]); HUDMSG_PLAIN,2,CR_GRAY,100.1,8.1,0);
+				hudmessagebold(s:"\cU[Press ",k:"+use",s:" to Skip]"; HUDMSG_PLAIN,5,CR_GOLD,320.0,100.0,0);
+		while(!skipping)
+			delay(1);
+		hudmessagebold(s:""; HUDMSG_PLAIN,2,CR_UNTRANSLATED,0,0,0.1);
+		hudmessagebold(s:""; HUDMSG_PLAIN,5,CR_UNTRANSLATED,0,0,0.1);
+		skipping=0;
+		skip_allowed=0;
+		briefing_pos++;
+	}
+	skip_allowed=0;
+	hudmessagebold(s:""; HUDMSG_PLAIN,4,CR_UNTRANSLATED,0,0,0.1);
+	hudmessagebold(s:""; HUDMSG_PLAIN,3,CR_UNTRANSLATED,0,0,0.1);
+	hudmessagebold(s:""; HUDMSG_PLAIN,2,CR_UNTRANSLATED,0,0,0.1);
+	hudmessagebold(s:""; HUDMSG_PLAIN,1,CR_UNTRANSLATED,0,0,0.1); //mxd
+	//Deactivate exclamation mark from Dirty Darren (Map Exit)
+	thing_deactivate(7);
+	briefing_seen=0;		//Reset Briefing state
+	if(eisenmann_active)
+	{
+		eisenmann_active=0;
+		TakeInventory("HQ_Checker",1); //re-enable usability for Grenades - Ozy
+		Teleport_NewMap(101,0,0); //Let's go to the secret mission
+	}
+	else if(astrostein_active)
+	{
+		astrostein_active=0;
+		TakeInventory("HQ_Checker",1); //re-enable usability for Grenades - Ozy
+		Teleport_NewMap(201,0,0); //Let's go to the secret mission
+	}
+	else
+	{
+		mission_number++;		//and set the next mission
+		TakeInventory("HQ_Checker",1); //re-enable usability for Grenades - Ozy
+		Teleport_NewMap(mission_number,0,0); //Let's go to the next mission
+	}
+}
+script "SKIPACTIVE" ENTER
+{
+	while(!skip_allowed)
+		delay(1);
+	int success = 0;
+	for(int i = 0;!success && i < 8;i++)	//for 8 players now; can be adjusted later
+		if(GetPlayerInput(i,INPUT_BUTTONS)&BT_USE)
+			success = 1;
+	if(success == 1)
+		skipping=1;
+	delay(1);
+	restart;
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//// Other Map Scripts ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//Plane Flyby Script
+script 1 OPEN
+{
+	if(daytime_intermap==1 || daytime_intermap==3 || daytime_intermap==4 || daytime_intermap==5)
+	{
+	ThingSound(95, "PLANE_FLYBY_3", 100);
+	delay(80);
+	SpawnProjectile(4,"CODStuka_Flight", random(155,160), 12, 0,0,0);
+	delay(random(210,2100));
+	}
+	delay(10);
+	restart;
+}
+
+//Secret Mission Script
+script 2 (int mission)
+{
+	if(mission==1)	//Eisenmann
+	{
+		floor_raisebyvalue(19, 2, 22);
+		eisenmann_akten++;
+		
+		if(eisenmann_akten<5)
+		{
+			ACS_NamedExecuteAlways("BoADialogue",0,"MS_PROF1","MS_PROF0","GUTENBERGCONVO18");
+		}
+		
+		if(eisenmann_akten==5)
+		{
+			//Change Gutenberg's dialogue
+			if(mission_number>=7)
+			{
+				if(astrostein_artifact>=5)
+					Thing_SetConversation(48,9);	//Gutenberg: Eisenmann and Astrostein are both complete
+				else
+					Thing_SetConversation(48,7);	//Gutenberg: Eisenmann is complete, but Astrostein is incomplete
+			}
+			else
+				Thing_SetConversation(48,5);	//Gutenberg: Eisenmann is complete
+			eisenmann_active=1;
+			ACS_NamedExecuteAlways("BoADialogue",0,"MS_PROF1","MS_PROF0","GUTENBERGCONVO19");
+		}
+	}
+	else if(mission==2)	//Astrostein
+	{
+		//floor_raisebyvalue(19, 10, 16);
+		astrostein_artifact++;
+		
+		if(astrostein_artifact<5)
+		{
+			ACS_NamedExecuteAlways("BoADialogue",0,"MS_PROF1","MS_PROF0","GUTENBERGCONVO20");
+		}
+		
+		if(astrostein_artifact==5)
+		{
+			//Change Gutenberg's dialogue
+			if(eisenmann_akten>=5)
+				Thing_SetConversation(48,9);	//Gutenberg: Eisenmann and Astrostein are both complete
+			else
+				Thing_SetConversation(48,8);	//Gutenberg: Eisenmann is incomplete, but Astrostein is complete
+			astrostein_active=1;
+			ACS_NamedExecuteAlways("BoADialogue",0,"MS_PROF1","MS_PROF0","GUTENBERGCONVO21");
+		}
+	}
+}
+
+//Generic Light Script
+script 408 (int light_tid)
+{
+	if(!GetActorProperty(light_tid, APROP_Dormant))
+		Thing_Deactivate(light_tid);
+	else
+		Thing_Activate(light_tid);
+	PlaySound(0, "SW_LIGHT");
+}
+
+///////////////
+// MUSIC BOX //
+///////////////
+
+#define JUKE_SONGS 9
+str jukeboxsongs[JUKE_SONGS] = {"BRIEFING", "JUKE01", "JUKE02", "JUKE03", "JUKE04", "JUKE05", "JUKE06", "JUKE07", "JUKE08"};
+
+//int jukeboxnr=0;
+
+script 155 (int jukeboxnr)
+{
+	setmusic("NOMUSIC", 0, 0);
+	ThingSound(54, "JKBX_CHG", 128);
+	delay(3*35);
+	if(++jukeboxnr == JUKE_SONGS)
+		jukeboxnr = 0;
+	setmusic(jukeboxsongs[jukeboxnr], 0, 0);
+}
+
+///////////////////////////////////////////////////////////////////
+//// General Map Scripts //////////////////////////////////////////
+///////////////////////////////////////////////////////////////////
+
+script "RemoveSupplyChest" UNLOADING
+{
+	// Remove the supply chest if has been opened and collected.
+	int chest_tid = 39;
+	if (ThingCount(T_NONE, chest_tid) == 1 &&
+		CheckActorClass(chest_tid, "EmptySupplyChest"))
+	{
+		Thing_Remove(chest_tid);
+	}
+}
+
+//Generic Flush Sound WC
+script 405 (int toilet_id)
+{
+	PlaySound(toilet_id, "toilet/flush", CHAN_BODY, 1.0, 0, 0);
+}
+
+//Generic Mirror Script
+script 406 (int line_id)
+{
+	TranslucentLine(line_id, 255);
+	GlassBreak(0);
+	SetLineTexture(line_id, SIDE_FRONT, TEXTURE_MIDDLE, "MIRR_W04");
+}
+
+//Generic Ladder Script
+script 409 (void)
+{
+    ThrustThingZ(0, 15, 0, 0);
+    ACS_NamedExecute("Laddersound", 0, 0, 0, 0);
+}
+
+script "Laddersound" (void)
+{
+    PlaySound (0, "world/ladder", CHAN_BODY, 0.71);
+    delay(15);
+}
+
+//Generic vent breaker script
+script 404 (int vent_id)
+{
+	SetLineBlocking(vent_id,BLOCK_NOTHING);
+}
+
+///////////////////////////////////////////////////////////////////
+//// Training Scripts /////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////
+
+int training_hit=0;
+int training_lesson=1;
+int training_done=0;
+
+script 801 (void)
+{
+	training_hit++;
+	
+	if(training_hit==1)
+	{
+		sethudsize(800,600,1);
+		setfont("OBJIC13");
+		hudmessage(s:"A";
+		HUDMSG_FADEINOUT,990,CR_UNTRANSLATED,400.0,115.1,1.0,0.5,0.5);
+	}
+	if(training_hit==2)
+	{
+		sethudsize(800,600,1);
+		setfont("OBJIC23");
+		hudmessage(s:"A";
+		HUDMSG_FADEINOUT,990,CR_UNTRANSLATED,400.0,115.1,1.0,0.5,0.5);
+	}
+	if(training_hit==3)
+	{
+		training_hit=0;				  	//Set the hits to 0 again
+		acs_execute(820, 0, 0, 0, 0); 	//Lower the lesson-depending gate
+		delay(1);
+		training_lesson++;			  	//Next lesson
+		ACS_NamedExecuteAlways("boaobjectiveaccomplished",0,0,0,0); //Objective accomplished
+		delay(35);
+		ACS_NamedExecute("CLEAR INVENTORY", 0);	//Clear the Inventory
+		ACS_NamedExecute("NOGRENADES", 0); //Clear grenades from the Tutorial - Ozy
+	}
+}
+//all delays augmented by 2 in order to avoid conflicts between dialogues and briefings - Ozy
+script 803 (void) //First briefing of Darren in the training room 
+{
+		//Darren first time in the training room
+		ACS_NamedExecuteAlways("BoADialogue",0,"MS_DARR1","MS_DARR0","DARRENTRAINING01");
+		//Remove exclamation mark
+		thing_remove(81);
+		delay(7*35);
+		floor_lowerbyvalue(109, 10, 128); //lower this gate only if the player interact with Darren - Ozy
+		num_grenades[PlayerNumber()] = CheckInventory("GrenadePickup"); // Talon1024
+}
+
+script 804 (void) //First lesson intro
+{
+		num_grenades[PlayerNumber()] = CheckInventory("GrenadePickup"); // Talon1024
+		ACS_NamedExecuteAlways("BoADialogue",0,"MS_DARR1","MS_DARR0","DARRENTRAINING02");
+		delay(7*35);
+		floor_lowerbyvalue(90, 10, 128); //lower this gate after 7 secs in order to avoid messy messages :P - Ozy
+}
+
+script 805 (void) //Second lesson intro
+{
+		ACS_NamedExecuteAlways("BoADialogue",0,"MS_DARR1","MS_DARR0","DARRENTRAINING04");
+		delay(7*35);
+		floor_lowerbyvalue(91, 10, 128);
+}
+
+script 806 (void) //Third lesson intro
+{
+		ACS_NamedExecuteAlways("BoADialogue",0,"MS_DARR1","MS_DARR0","DARRENTRAINING05");
+		TakeInventory("HQ_Checker",1); //enable the possibility to throw grenades - ozy81
+		delay(7*35);
+		floor_lowerbyvalue(92, 10, 128);
+}
+
+script 807 (void) //Fourth lesson intro
+{
+		ACS_NamedExecuteAlways("BoADialogue",0,"MS_DARR1","MS_DARR0","DARRENTRAINING06");
+		delay(7*35);
+		floor_lowerbyvalue(93, 10, 128);
+}
+
+script 808 (void) //Fifth lesson intro
+{
+		ACS_NamedExecuteAlways("BoADialogue",0,"MS_DARR1","MS_DARR0","DARRENTRAINING07");
+}
+
+script 812 (void) //Sixth lesson intro - moved here by Ozy
+{
+		ACS_NamedExecuteAlways("BoADialogue",0,"MS_DARR1","MS_DARR0","DARRENTRAINING08");
+}
+
+script 809 (void) //Done
+{
+		//Darren first time in the training room
+		if(GetActorProperty(0,APROP_Health)<70)
+		{
+				ACS_NamedExecuteAlways("BoADialogue",0,"MS_DARR1","MS_DARR0","DARRENTRAINING10");
+		}	
+		else
+		{
+				ACS_NamedExecuteAlways("BoADialogue",0,"MS_DARR1","MS_DARR0","DARRENTRAINING09");
+		}
+
+		// Talon1024 - grenade fix
+		if (CheckInventory("GrenadePickup") < num_grenades[PlayerNumber()]) {
+			GiveInventory("GrenadePickup", num_grenades[PlayerNumber()] - CheckInventory("GrenadePickup"));
+		} else if (CheckInventory("GrenadePickup") > num_grenades[PlayerNumber()]) {
+			GiveInventory("GrenadePickup", CheckInventory("GrenadePickup") - num_grenades[PlayerNumber()]);
+		}
+		
+		GiveInventory("HQ_Checker",1); //disable grenades on HQs
+		floor_raisebyvalue(109, 10, 128); //raise this gate in order to block the passage to training place - Ozy
+		delay(20*35);
+		thing_remove(65);
+}
+
+script 810 (void) //Give Grenade
+{
+	if(CheckInventory("GrenadePickup")<3)
+	{
+		GiveInventory("GrenadePickup", 1);
+	}
+}
+
+script 811 (void) //Give Rocket - ozy81
+{
+	if(CheckInventory("PanzerAmmo")<4)
+	{
+		GiveInventory("PanzerAmmo", 1);
+	}
+}
+
+script 820 (void)
+{
+	floor_lowerbyvalue(300+training_lesson, 20, 128);
+}
+
+
+script 821 (int buddha_activate)
+{
+	if(buddha_activate==1)	
+	{
+		SetPlayerProperty(0, 1, PROP_BUDDHA);
+	}
+	else
+	{
+		SetPlayerProperty(0, 0, PROP_BUDDHA);
+	}
+}
+
+script 987 (void)
+{
+	thing_activate(97);
+}

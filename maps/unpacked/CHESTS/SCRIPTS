@@ -1,0 +1,48 @@
+#include "zcommon.acs"
+
+function void SpawnAndToss(str class_name, int x, int y, int z)
+{
+	int tid = UniqueTID();
+	if (SpawnForced(class_name, x, y, z, tid))
+	{
+		SetActorVelocity(tid, Random(-4.0, 4.0), Random(-4.0, 4.0), 8.0, false, false);
+	}
+}
+
+script 1 (int chest_tid)
+{
+	Print(s:"Empty chest.");
+}
+
+script 2 (int chest_tid)
+{
+	Print(s:"Empty with custom script.");
+	
+	int x = GetActorX(chest_tid);
+	int y = GetActorY(chest_tid);
+	int z = GetActorZ(chest_tid);
+	
+	SpawnAndToss("TrenchShotgun", x, y, z);
+	SpawnAndToss("12GaugeAmmoBox", x, y, z);
+	SpawnAndToss("12GaugeAmmoBox", x, y, z);
+}
+
+script "OBJECTIVES" OPEN
+{
+	//Set primary objectives
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,0,"MO_ICON_OPN");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,1,0,"Unlock an empty chest");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,1,"MO_ICON_OPN");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,1,1,"Unlock a chest containing a rifle");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,2,"MO_ICON_OPN");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,1,2,"Unlock a chest containing a trenchgun");
+	//Set secondary objectives
+	ACS_NamedExecuteAlways("boaobjectivesset",0,1,3,"Unlock a chest containing 25 coins");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,3,"MO_ICON_OPN");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,1,4,"Unlock a chest containing 50 coins");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,4,"MO_ICON_OPN");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,1,5,"Unlock a chest containing 100 coins");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,5,"MO_ICON_OPN");
+	
+	SpawnSpotForced("EmptySupplyChest", 20, 0, 0);
+}

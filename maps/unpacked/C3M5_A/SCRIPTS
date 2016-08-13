@@ -1,0 +1,65 @@
+#include "zcommon.acs"
+
+script 100 OPEN //Setting up the map
+{
+	Thing_Activate(15);
+	//Darren briefs you
+	delay(3*35);
+    ACS_NamedExecuteAlways("BoADialogue",0,"MS_DARR1","MS_DARR0","DARRENMESSAGE01");
+}
+
+///////////////////
+//GENERIC SCRIPTS//
+///////////////////
+
+//Generic Flush Sound WC
+script "Flush" (int toilet_id)
+{
+	PlaySound(toilet_id, "toilet/flush", CHAN_BODY, 1.0, 0, 0);
+}
+
+//Generic Mirror Script
+script "Mirror" (int line_id)
+{
+	TranslucentLine(line_id, 255);
+	GlassBreak(0);
+	SetLineTexture(line_id, SIDE_FRONT, TEXTURE_MIDDLE, "MIRR_W04");
+}
+
+//Generic Light Script
+script "Lights" (int light_tid)
+{
+	if(!GetActorProperty(light_tid, APROP_Dormant))
+		Thing_Deactivate(light_tid);
+	else
+		Thing_Activate(light_tid);
+	PlaySound(0, "SW_LIGHT");
+}
+
+//Generic vent breaker script
+script "VentBreak" (int vent_id)
+{
+	SetLineBlocking(vent_id,BLOCK_NOTHING);
+}
+
+//Generic Ladder Scripts
+script "Ladders" (void)
+{
+	ThrustThingZ(0, 15, 0, 0);
+	ACS_NamedExecute("LadderSound", 0, 0, 0, 0);
+}
+
+script "LadderSound" (void)
+{
+	PlaySound (0, "world/ladder", CHAN_BODY, 0.71);
+	delay(15);
+}
+
+//Shakes - remember it for final battle
+script "ShakeMeBabe" (void)
+{
+	delay(random(35, 700));
+	Radius_Quake2 (0,random(4,16),45,0,32," ");
+	delay (random(35, 512));
+	restart;
+}

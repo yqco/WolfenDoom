@@ -1,0 +1,415 @@
+#include "zcommon.acs"
+
+//Set up the Mission Objectives
+script "OBJECTIVES" OPEN
+{
+	//Set primary objectives
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,0,"MO_ICON_OPN");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,1,0,"MO_C1M2_P1");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,1,"MO_ICON_OPN");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,1,1,"MO_C1M2_P2");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,2,"MO_ICON_OPN");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,1,2,"MO_C1M2_P3");
+	//Set secondary objectives
+	ACS_NamedExecuteAlways("boaobjectivesset",0,1,3,"MO_C1M2_S1");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,3,"MO_ICON_OPN");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,1,4,"MO_C1M2_S2");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,4,"MO_ICON_OPN");
+}
+
+script "ConveyorBelt" OPEN
+{
+	Scroll_Floor(195, 20, 0, SCROLL_AND_CARRY);
+	Scroll_Floor(196, 0, 20, SCROLL_AND_CARRY);
+	Scroll_Floor(202, 0, 20, SCROLL_AND_CARRY);
+	
+	while(0==0)
+	{
+		//SpawnSpotForced("MutantSubjectRandom", 194, 0, 0);
+		SpawnSpotForced("TestCrate2", 194, 0, 0);
+		//SpawnSpotForced("RadioactiveBarrel", 194, 671, 0);
+		//SetActorProperty(671, APROP_RenderStyle, STYLE_Translucent);
+		//SetActorProperty(671, APROP_Alpha, 0.0);
+		delay(random(10*35,20*35));
+	}
+}
+
+//Curtains in execution room
+int vorhang_status=0;
+
+script 197 (void)
+{
+	if(vorhang_status==0)
+	{
+		Polyobj_Move(150, 8, 128, 64);
+		Polyobj_Move(151, 7, 128, 48);
+		Polyobj_Move(152, 6, 128, 32);
+		Polyobj_Move(153, 5, 128, 16);
+		PolyWait(150);
+		vorhang_status=1;
+	}
+	else
+	{
+		Polyobj_Move(150, 8, 0, 64);
+		Polyobj_Move(151, 7, 0, 48);
+		Polyobj_Move(152, 6, 0, 32);
+		Polyobj_Move(153, 5, 0, 16);
+		PolyWait(150);
+		vorhang_status=0;
+	}
+	
+}
+
+
+//Elevator Second Building
+int elev_position=0;
+
+script 192 (void)
+{
+	floor_raisebyvalue(209, 10, 128);
+	delay(140);
+	if(elev_position==0)
+	{
+		Floor_RaiseByValue(207, 10, 188);
+		Ceiling_RaiseByvalue(207, 10, 188);
+		elev_position=1;
+	}
+	else
+	{
+		Floor_LowerByValue(207, 10, 188);
+		Ceiling_LowerByvalue(207, 10, 188);
+		elev_position=0;
+	}
+	delay(5*35);
+	floor_lowerbyvalue(209, 10, 128);
+}
+
+
+//Double Switch lowers Gate
+int gate_switch;
+
+script 1 (void)
+{
+	if(gate_switch==1)
+	{
+		Floor_LowerByValue(5,10,88);
+		Floor_LowerByValue(6,10,88);
+		//Mark primary objective 1 complete
+		ACS_NamedExecuteAlways("boaobjectivesset",0,0,0,"MO_ICON_ACC");
+		ACS_NamedExecuteAlways("boaobjectiveaccomplished",0,0,0,0);
+	}
+	else
+	{
+		gate_switch++;
+		door_open(21, 20, 0);
+		/*printbold(s: "\cCOne more to go");*/
+	}
+}
+
+//Dummy Script
+script 2 (void)
+{
+	delay(1);
+}
+
+//Wrong Side
+script 3 (void)
+{
+	print(l:"MAPMESSAGES01");
+}
+
+//Weapon taken OR door leaving
+int escape_active;
+
+script 4 (void)
+{
+	if(escape_active==1)
+		terminate;
+	escape_active++;
+	thing_activate(55);
+	setmusic("HURRY");
+	ACS_NamedExecuteAlways("BoADialogue",0,"MS_PRIB1","MS_PRIB0","PRISONERMESSAGE02");
+	delay(5*35);
+	thing_activate(76);
+}
+
+//Alarm deactivated
+script 5 (void)
+{
+	thing_deactivate(55);
+}
+
+//Open door after tank hall
+script 6 (void)
+{
+	ceiling_raisebyvalue(58,200,128);
+	int tid1 = UniqueTID();
+	int tid2 = UniqueTID();
+	spawnspotfacing("SuperSoldier",66,tid1);
+	spawnspotfacing("SuperSoldier",113,tid2);
+	Thing_SetGoal(tid1, 105, 0, false);
+	Thing_SetGoal(tid2, 109, 0, false);
+}
+
+//Blue Key taken
+script 7 (void)
+{
+	thing_remove(100);
+	spawnspotfacing("Miniship",68,0);
+}
+
+//Repopulate Backatrack after prisoner freed
+script 8 (void)
+{
+	spawnspotfacing("SSGuard",59,0);
+	spawnspotfacing("SSMP40Guard",60,0);
+	spawnspotfacing("Doberman",71,0);
+}
+
+//Spawn a few baddies close to the end
+script 9 (void)
+{
+	spawnspotfacing("Doberman",75,0);
+}
+
+//Flamemen fix
+script 10 (void)
+{
+    delay(1);
+    SpawnSpotFacingForced("FlamerSoldier", 67, 0);
+}
+
+//Shore
+script 11 OPEN
+{
+    thing_activate(122);
+    thing_activate(123);
+    thing_activate(124);
+    thing_activate(125);
+    delay(random(105, 140));
+    restart;
+}
+
+//Mark primary objective 2 complete
+script 12 (void)
+{
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,1,"MO_ICON_ACC");
+	ACS_NamedExecuteAlways("boaobjectiveaccomplished",0,0,0,0);
+}
+
+//Mark secondary objective 2 complete
+script 13 (void)
+{
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,4,"MO_ICON_ACC");
+	ACS_NamedExecuteAlways("boaobjectiveaccomplished",0,0,0,0);
+}
+
+//Trap after picking up the Eisenmann files
+script 14 (void)
+{
+	door_open(164, 20, 0);
+	Polyobj_Move(132, 20, 128, 112);
+	thing_remove(165);
+}
+
+//Open prison doors
+script 15 (void)
+{
+	Polyobj_DoorSwing(1, 16, 64, 24*60*60*35);
+	Polyobj_DoorSwing(6, 16, 64, 24*60*60*35);
+	Polyobj_DoorSwing(11, 16, 64, 24*60*60*35);
+	Polyobj_DoorSwing(16, 16, 64, 24*60*60*35);
+}
+
+//Schwabbelhals Script
+script 16 (void)
+{
+	Floor_RaiseToLowestCeiling(181, 30); //close door for a while
+	delay(2*70);
+	Light_Fade(178, 190, 70); //brighten up commando room
+	delay(2*35);
+	Thing_SetGoal(182, 180, 0, 0); //make Schwabbelhals move
+	delay(1*35);
+	playsound(187, "hitlerghost/die"); //make Schwabbelhals laugh
+	delay(2*35);
+	Polyobj_Move(136, 20, 64, 160); //open doors
+	Polyobj_Move(138, 20, 64, 160);
+	delay(2*105);
+	floor_raisebyvalue(183, 20, 64); //close pods
+	delay(2*70);
+	thing_activate(186); //activate light
+	thing_activate(190); //activate steam
+	delay(2*35);
+	playsound(187, "ALARM_DOOD"); delay(35);
+	playsound(187, "ALARM_DOOD"); delay(35);
+	playsound(187, "ALARM_DOOD"); delay(35);
+	thing_remove(184); //remove specimen
+	SpawnspotFacingForced("MutantRocket", 185, 0); //spawn clouds
+	SpawnSpotFacingForced("MutantMelee", 185, 9000); //spawn mutants
+	delay(2*35);
+	floor_lowerbyvalue(183, 20, 64); //open pods
+	thing_activate(188);
+	while(thingcount(0, 9000)>0)
+	{
+		delay(35);
+	}
+	delay(2*35);
+	Light_Fade(178, 130, 70); //brighten up commando room
+	floor_lowerbyvalue(178, 10, 176);
+	thing_deactivate(190); //deactivate steam
+	delay(35);
+	thing_move(182, 186, 1);
+	delay(140);
+	Thing_ChangeTID(182,0); //remove the TID from Schwabbelhals or the HealthBar will not be displayed - ozy81
+	Floor_LowerToLowest(181, 30); //open door again
+}
+
+script 17 OPEN
+{
+	SetCameraToTexture(210, "ASTR_CVE", 90);
+	SetCameraToTexture(213, "ASTR_CVF", 90);
+}
+
+//////////////////////////////////////
+////// Generic Effect Scripts ////////
+//////////////////////////////////////
+
+script 402 ENTER
+//Setup the player
+{
+	GiveInventory("Luger9mm",1);
+	GiveInventory("9mmAmmo",8);
+	GiveInventory("TrenchShotgun",1);
+	GiveInventory("12GaugeAmmo",10);
+	GiveInventory("KnifeSilent",1);
+	SetWeapon("Luger9mm");
+}
+
+//Spark Spawner Script
+script 403 OPEN
+{
+	thing_activate(42);
+	delay(random(10,20));
+	thing_deactivate(42);
+	delay(random(35,350));
+	restart;
+}
+
+//Generic vent breaker script
+script 404 (int vent_id)
+{
+	SetLineBlocking(vent_id,BLOCK_NOTHING);
+}
+
+//Generic Flush Sound WC
+script 405 (int toilet_id)
+{
+	PlaySound(toilet_id,"toilet/flush",CHAN_BODY,1.0,0,0);
+}
+
+//Generic Mirror Script
+script 406 (int line_id)
+{
+	TranslucentLine(line_id,255);
+	GlassBreak(0);
+	SetLineTexture(line_id,SIDE_FRONT,TEXTURE_MIDDLE,"MIRR_W04");
+}
+
+//Water Waggle & Plane Reflection
+script 407 OPEN
+{
+	Ceiling_Waggle(30,32,16,0,0);
+	Ceiling_Waggle(115,64,16,0,0); //mxd. Start beach waves
+	Sector_SetPlaneReflection(73,20,0);
+}
+
+//Generic Light Script
+script 408 (int light_tid)
+{
+	if(!GetActorProperty(light_tid,APROP_Dormant))
+		Thing_Deactivate(light_tid);
+	else
+		Thing_Activate(light_tid);
+	//PlaySound(0,"SW_LIGHT");
+}
+
+//Generic Ladder Script
+script 409 (void)
+{
+    ThrustThingZ(0, 15, 0, 0);
+    ACS_NamedExecute("Laddersound", 0, 0, 0, 0);
+}
+
+script "Laddersound" (void)
+{
+    PlaySound (0, "world/ladder", CHAN_BODY, 0.71);
+    delay(15);
+}
+
+//mxd. Generic lightning storm
+script "LightningLoop" (int tag, int minradius, int maxradius)
+{
+    int x = GetActorX(tag);
+    int y = GetActorY(tag);
+    int z = GetActorZ(tag);
+    int diff = (maxradius - minradius) / 2;
+
+    while(true)
+    {
+        int dist = Random(minradius, maxradius);
+        int angle = Random(0, 255) << 8;
+        int vol = (dist - minradius) * 64 / diff;
+
+        Spawn("LightningBolt", x + FixedMul(sin(angle), (dist << 16)), y + FixedMul(cos(angle), (dist << 16)), z);
+		
+		// Light some sectors up
+		Light_ChangeToValue(192, 200);
+		Light_Fade(192,147, 20);
+
+        Delay(Random(20, 100));
+        AmbientSound("misc/thunder", 64 + vol);
+
+        Delay(Random(875, 2100)); // Repeat every 25 - 60 seconds
+    }
+}
+
+//////////////////////////////////////
+////////// Briefing Scripts //////////
+//////////////////////////////////////
+
+int message_finished;
+
+script 20 OPEN //Darren briefs you
+{
+	delay(3*35);
+	ACS_NamedExecuteAlways("BoADialogue",0,"MS_DARR1","MS_DARR0","DARRENMESSAGE03");
+
+  //mxd. Start the lighning storm
+  Delay(35);
+  ACS_NamedExecute("LightningLoop", 0, 97, 64, 128);
+}
+
+script 21 (void) //Prisoner talks to you
+{
+	ACS_NamedExecuteAlways("BoADialogue",0,"MS_PRIB1","MS_PRIB0","PRISONERMESSAGE01");
+	delay(2*35);
+ 	thing_activate(76);
+	thing_activate(86);
+	//Mark primary objective 1 complete
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,2,"MO_ICON_ACC");
+	ACS_NamedExecuteAlways("boaobjectiveaccomplished",0,0,0,0);
+}
+
+script 22 (void) //Darren briefs you again
+{
+	delay(3*35);
+	ACS_NamedExecuteAlways("BoADialogue",0,"MS_DARR1","MS_DARR0","DARRENMESSAGE04");
+}
+
+script 23 (void) //Prisoner talks to you
+{
+	delay(3*35);
+	ACS_NamedExecuteAlways("BoADialogue",0,"MS_PRIB1","MS_PRIB0","PRISONERMESSAGE03");
+	delay(5*35);
+	thing_activate(76);
+}

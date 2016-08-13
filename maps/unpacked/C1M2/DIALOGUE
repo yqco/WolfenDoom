@@ -1,0 +1,23 @@
+namespace = "ZDoom";
+include = "SCRIPT00";
+
+conversation
+{
+    actor = "PrisonerAgent"; //"Prisoner";
+    page //The page block here marks the first page
+    {
+         name = "\cQPrisoner";
+         dialog = "\cCFinally! I thought I would rott in this damned place before the war ends. I am Cpt. Ryan.";
+         panel = "DLP_NIG1"; 
+         voice = "DLV_NIG1"; 
+         
+         choice
+         {
+              text = "\cCLet's get out of this!";
+              nextpage = 1;
+              special = 80;
+              arg0 = 21;
+              closedialog = true;
+         }
+    }
+}

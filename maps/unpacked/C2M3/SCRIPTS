@@ -1,0 +1,217 @@
+#include "zcommon.acs"
+
+script "OBJECTIVES" OPEN
+{
+	//Set primary objectives
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,0,"MO_ICON_OPN");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,1,0,"MO_C2M3_P1");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,1,"MO_ICON_OPN");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,1,1,"MO_C2M3_P2");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,2,"MO_ICON_OPN");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,1,2,"MO_C2M3_P3");
+	//Set secondary objectives
+	ACS_NamedExecuteAlways("boaobjectivesset",0,1,3,"MO_C2M3_S1");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,3,"MO_ICON_OPN");
+}
+
+script 200 (void)
+{
+	//Prim Objective 1 solved
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,0,"MO_ICON_ACC");	
+	ACS_NamedExecuteAlways("boaobjectiveaccomplished",0,0,0,0);
+}
+
+script 201 (void)
+{
+	//Prim Objective 1 solved
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,1,"MO_ICON_ACC");	
+	ACS_NamedExecuteAlways("boaobjectiveaccomplished",0,0,0,0);
+}
+
+script 202 (void)
+{
+	//Prim Objective 1 solved
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,2,"MO_ICON_ACC");	
+	ACS_NamedExecuteAlways("boaobjectiveaccomplished",0,0,0,0);
+}
+
+int	chestcounter=0;
+
+script 203 (void)
+{
+	chestcounter++;
+	
+	if(chestcounter==2)
+	{
+		ACS_NamedExecuteAlways("boaobjectivesset",0,0,3,"MO_ICON_ACC");
+		ACS_NamedExecuteAlways("boaobjectiveaccomplished",0,0,0,0);
+	}
+}
+
+script 204 (void)
+{
+	//Sec Objective 2 solved
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,4,"MO_ICON_ACC");	
+	ACS_NamedExecuteAlways("boaobjectiveaccomplished",0,0,0,0);
+}
+
+script 205 (void)
+{
+	//Sec Objective 3 solved
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,5,"MO_ICON_ACC");	
+	ACS_NamedExecuteAlways("boaobjectiveaccomplished",0,0,0,0);
+}
+
+
+
+
+
+int daynight_skybox=255;	//Translucency for overlay
+int daynight_color=255;		//Color for sector light
+
+script 1 OPEN	//Day->Night Transition
+{
+	while(daynight_skybox>0)
+	{
+		TranslucentLine(2, daynight_skybox);
+		sector_setcolor(1, daynight_color, 200, 255, 0);
+		daynight_skybox--;
+		if(daynight_color>160)
+			daynight_color--;
+		delay(140);
+	}
+}
+
+script 2 (void)
+{
+	//dummy
+}
+
+script 3 (void)	//Boss battle initiating
+{
+	door_open(179, 15, 0);
+	Door_CloseWaitOpen(180, 15, 350, 0);
+}
+
+script 4 (void)	//Boss battle initiating 2
+{
+	floor_raisetonearest(186, 20);
+}
+
+int mission_acc;
+
+script 5 (void)	//Mission accomplished?
+{
+	if(mission_acc==1)
+	{
+		Exit_Normal(0);
+		thing_activate(187);
+	}
+	//else
+		//dialogue of Darren here
+}
+
+int darren_talk;
+
+script 6 (void)	//Collect objective
+{
+	SpawnSpotFacingForced("SSTank4", 236, 0);
+
+	//Dialogue from Darren when collecting
+	ACS_NamedExecuteAlways("BoADialogue",0,"MS_DARR1","MS_DARR0","DARRENMESSAGE21");
+	darren_talk=1;
+	thing_activate(187);
+}
+
+script 7 (void)
+{
+	if(!darren_talk)
+	{
+		//Dialogue from Darren at the start
+		ACS_NamedExecuteAlways("BoADialogue",0,"MS_DARR1","MS_DARR0","DARRENMESSAGE19");
+		thing_deactivate(187);
+	}
+	else
+		Exit_Normal(0);
+}
+
+script 8 (void)
+{
+	//Dialogue from Darren when entering
+	ACS_NamedExecuteAlways("BoADialogue",0,"MS_DARR1","MS_DARR0","DARRENMESSAGE20");
+}
+
+//////////////////////////////////////
+////// Generic Effect Scripts ////////
+//////////////////////////////////////
+
+script 402 ENTER	//Setup the player & Map
+{
+	GiveInventory("Luger9mm",1);
+	GiveInventory("9mmAmmo",8);
+	GiveInventory("KnifeSilent",1);
+	SetWeapon("Luger9mm");
+
+	//Moving Water
+	scroll_floor(26, 128, 0, 0);
+	scroll_ceiling(26, 128, 0, 0);
+	scroll_floor(27, 0, -128, 0);
+	scroll_ceiling(27, 0, -128, 0);
+
+	//Plane Reflection
+	Sector_SetPlaneReflection(161, 32, 0);
+	Sector_SetPlaneReflection(228, 32, 0);
+}
+
+script 403 OPEN	//Spark Spawner (id 42)
+{
+	thing_activate(138);
+	delay(random(10,20));
+	thing_deactivate(138);
+	delay(random(35,350));
+	restart;
+}
+
+script 404 (int vent_id)	//Generic vent breaker script
+{
+	SetLineBlocking(vent_id,BLOCK_NOTHING);
+}
+
+script 405 (int toilet_id)	//Generic Flush Sound WC
+{
+	PlaySound(toilet_id,"toilet/flush",CHAN_BODY,1.0,0,0);
+}
+
+script 406 (int line_id)	//Generic Mirror Script
+{
+	TranslucentLine(line_id,255);
+	GlassBreak(0);
+	SetLineTexture(line_id,SIDE_FRONT,TEXTURE_MIDDLE,"MIRR_W04");
+}
+
+script 407 OPEN	//Water Waggle & Plane Reflection
+{
+	//Ceiling_Waggle(30,32,16,0,0);
+	Sector_SetPlaneReflection(128,20,0);
+}
+
+script 408 (int light_tid)	//Generic Light Script
+{
+	if(!GetActorProperty(light_tid,APROP_Dormant))
+		Thing_Deactivate(light_tid);
+	else
+		Thing_Activate(light_tid);
+	PlaySound(0,"SW_LIGHT");
+}
+
+script 409 (void)	//Generic Ladder Script
+{
+	ThrustThingZ(0, 15, 0, 0);
+	ACS_NamedExecute("Laddersound", 0, 0, 0, 0);
+}
+
+script "Laddersound" (void)
+{
+	PlaySound (0, "world/ladder", CHAN_BODY, 0.71);
+	delay(15);
+}

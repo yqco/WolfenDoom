@@ -1,0 +1,246 @@
+#include "zcommon.acs"
+#import "source/stealth.acs" //mxd							##### console "set g_debugstealth 1" for debugging the stealth system
+
+global int 5:HealthScriptDeactivate;
+
+///////////////// OBJECTIVES START
+
+script "OBJECTIVES" OPEN
+{
+	//Set primary objectives
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,0,"MO_ICON_OPN");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,1,0,"MO_C2M1_P1");
+	//Set secondary objectives
+	ACS_NamedExecuteAlways("boaobjectivesset",0,1,3,"MO_C2M1_S1");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,3,"MO_ICON_OPN");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,1,4,"MO_C2M1_S2");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,4,"MO_ICON_OPN");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,1,5,"MO_C2M1_S3");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,5,"MO_ICON_OPN");
+}
+
+script "STARTMESSAGE" OPEN
+{
+	delay(2*35);
+	SetHudSize(640, 480, true);
+	hudmessagebold(l: "HINTTEXTC2M1A"; HUDMSG_FADEINOUT,80,CR_GRAY,320.0,470.0,3.0,1.0,1.0);
+}
+
+script 200 (void)
+{
+	//Prim Objective 1 solved
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,0,"MO_ICON_ACC");	
+	ACS_NamedExecuteAlways("boaobjectiveaccomplished",0,0,0,0);
+}
+
+script 201 (void)
+{
+	//Prim Objective 2 solved
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,1,"MO_ICON_ACC");	
+	ACS_NamedExecuteAlways("boaobjectiveaccomplished",0,0,0,0);
+}
+
+script 202 (void)
+{
+	//Prim Objective 3 solved
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,2,"MO_ICON_ACC");	
+	ACS_NamedExecuteAlways("boaobjectiveaccomplished",0,0,0,0);
+}
+
+script 203 (void)
+{
+	//Sec Objective 2 solved
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,4,"MO_ICON_ACC");	
+	ACS_NamedExecuteAlways("boaobjectiveaccomplished",0,0,0,0);
+}
+
+int script301_once=0;
+
+script 301 (void)
+{
+	if(script301_once>0)
+	{
+		terminate;
+	}
+	
+	//Prim Objective 2 added
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,1,"MO_ICON_OPN");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,1,1,"MO_C2M1_P2");
+	ACS_NamedExecuteAlways("boaobjectiveadded",0,0,0,0);
+	
+	ACS_Execute(200,0,0,0,0);
+}
+
+script 302 (void)
+{
+	//Prim Objective 3 added
+	ACS_NamedExecuteAlways("boaobjectivesset",0,0,2,"MO_ICON_OPN");
+	ACS_NamedExecuteAlways("boaobjectivesset",0,1,2,"MO_C2M1_P3");
+	ACS_NamedExecuteAlways("boaobjectiveadded",0,0,0,0);
+	
+	ACS_Execute(201,0,0,0,0);
+}
+
+///////////////// OBJECTIVES END
+
+//Elevator Second Building
+int elev_position=0;
+
+script 192 (void)
+{
+	floor_raisebyvalue(209, 10, 96);
+	delay(140);
+	if(elev_position==0)
+	{
+		Floor_RaiseByValue(207, 10, 128);
+		Ceiling_RaiseByvalue(207, 10, 128);
+		elev_position=1;
+	}
+	else
+	{
+		Floor_LowerByValue(207, 10, 128);
+		Ceiling_LowerByvalue(207, 10, 128);
+		elev_position=0;
+	}
+	delay(5*35);
+	floor_lowerbyvalue(209, 10, 96);
+}
+
+
+script 1 ENTER
+{
+    HealthScriptDeactivate = true;
+    SetActorProperty(0, APROP_Health, 5);
+    ACS_NamedExecute("CLEAR INVENTORY", 0);
+
+    //mxd. Stealth system usage
+    VisibilityMultiplier = 0.4; // Make the player less visible
+    //NoiseLevelMultiplier = 0.9; // And slightly less hearable
+    //ShowStealthHUD = true; // Show the HUD
+    //PlayerDetectionVisibility = 100;
+}
+
+script 2 (void) //Lower Gate, change lights
+{
+    floor_lowerbyvalue(33, 20, 128);
+    thing_activate(3);
+    thing_deactivate(2);
+}
+
+script 3 (void) //Lower Water, Kill Sharks
+{
+    delay(2*35);
+    ceiling_lowerbyvalue(81, 5, 256);
+    thing_remove(82);
+
+}
+
+int radios_killed=0;
+
+script 4 (int sparkler) //Switch Sparker
+{
+    thing_activate(sparkler);
+    delay(10);
+    thing_remove(sparkler);
+	radios_killed++;
+	
+	if(radios_killed==4)
+	{
+		//Sec Objective 3 solved
+		ACS_NamedExecuteAlways("boaobjectivesset",0,0,5,"MO_ICON_ACC");	
+		ACS_NamedExecuteAlways("boaobjectiveaccomplished",0,0,0,0);
+		
+	}
+}
+
+script 5 (void) //Alarm execute
+{
+    delay(random(70,210));
+    thing_activate(127);
+	SpawnSpotFacingForced("SSGuard", 142, 0);
+	SpawnSpotFacingForced("GermanShepherd", 143, 0);
+}
+
+script 6 (void) //first time outside message
+{
+    ACS_NamedExecuteAlways("BoADialogue",0,"MS_DARR1","MS_DARR0","DARRENMESSAGE22");
+    thing_remove(128);
+	delay(5*25);
+	ACS_ExecuteAlways(301,0,0,0,0);
+}
+
+script 7 (void) //wood message from Darren
+{
+    ACS_NamedExecuteAlways("BoADialogue",0,"MS_DARR1","MS_DARR0","DARRENMESSAGE23");
+	ACS_ExecuteAlways(302,0,0,0,0);
+}
+
+script 77 (void) //final message before reaching Darren
+{
+    ACS_NamedExecuteAlways("BoADialogue",0,"MS_DARR1","MS_DARR0","DARRENMESSAGE24");
+}
+
+script 8 (void) //final message before reaching Darren
+{
+    ACS_NamedExecuteAlways("BoADialogue",0,"MS_DARR1","MS_DARR0","DARRENMESSAGE48");
+}
+
+
+
+//////////////////////////////////////
+////// Generic Effect Scripts ////////
+//////////////////////////////////////
+
+script 402 ENTER { //Setup the player & Map
+
+        //Plane Reflection
+        Sector_SetPlaneReflection(7, 32, 0);
+        Sector_SetFriction(7, 1.5);
+}
+
+script 403 OPEN { //Spark Spawner (id 42)
+	thing_activate(138);
+	delay(random(10,20));
+	thing_deactivate(138);
+	delay(random(35,350));
+	restart;
+}
+
+script 404 (int vent_id) { //Generic vent breaker script
+	SetLineBlocking(vent_id,BLOCK_NOTHING);
+}
+
+script 405 (int toilet_id) { //Generic Flush Sound WC
+	PlaySound(toilet_id,"toilet/flush",CHAN_BODY,1.0,0,0);
+}
+
+
+script 406 (int line_id) { //Generic Mirror Script
+	TranslucentLine(line_id,255);
+	GlassBreak(0);
+	SetLineTexture(line_id,SIDE_FRONT,TEXTURE_MIDDLE,"MIRR_W04");
+}
+
+script 407 OPEN { //Water Waggle & Plane Reflection
+	//Ceiling_Waggle(30,32,16,0,0);
+	Sector_SetPlaneReflection(128,20,0);
+}
+
+script 408 (int light_tid) { //Generic Light Script
+	if(!GetActorProperty(light_tid,APROP_Dormant))
+		Thing_Deactivate(light_tid);
+	else
+		Thing_Activate(light_tid);
+	PlaySound(0,"SW_LIGHT");
+}
+
+script 409 (void) { //Generic Ladder Script
+    ThrustThingZ(0, 15, 0, 0);
+    ACS_NamedExecute("Laddersound", 0, 0, 0, 0);
+}
+
+script "Laddersound" (void)
+{
+    PlaySound (0, "world/ladder", CHAN_BODY, 0.71);
+    delay(15);
+}

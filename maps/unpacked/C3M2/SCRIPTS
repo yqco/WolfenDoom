@@ -1,0 +1,98 @@
+#include "zcommon.acs"
+
+script 2 (void) //Stop fan
+{
+	ambientsound("LightOff", 127);
+	SetLineTexture(19, SIDE_FRONT, TEXTURE_MIDDLE, "TEXTURES/FANWALL1.PNG");
+	Thing_Deactivate(19);
+	Sector_SetWind(19, 0, 0, 0);
+	Radius_Quake(2, 10, 0, 128, 20);
+}
+
+//////////////////////////////////////
+////// Generic Effect Scripts ////////
+//////////////////////////////////////
+
+script 402 ENTER	//Setup the player & Map
+{
+	GiveInventory("Luger9mm",1);
+	GiveInventory("KnifeSilent",1);
+	SetWeapon("Luger9mm");
+
+	//Wind Effect from Fan
+	Sector_SetWind(19, 240, 192, 0);
+	
+	//Water Reflection Gradient
+	Sector_SetPlaneReflection(45, 32, 0);
+	Sector_SetPlaneReflection(46, 64, 0);
+	Sector_SetPlaneReflection(47, 96, 0);
+	Sector_SetPlaneReflection(50, 128, 0);
+	
+}
+
+script 403 OPEN	//Spark Spawner (id 138)
+{
+	thing_activate(138);
+	delay(random(10,20));
+	thing_deactivate(138);
+	delay(random(35,350));
+	restart;
+}
+
+script 404 (int vent_id)	//Generic vent breaker script
+{
+	SetLineBlocking(vent_id,BLOCK_NOTHING);
+}
+
+script 405 (int toilet_id)	
+{	//Generic Flush Sound WC
+	PlaySound(toilet_id,"toilet/flush",CHAN_BODY,1.0,0,0);
+}
+
+script 406 (int line_id)	
+{	//Generic Mirror Script
+	TranslucentLine(line_id,255);
+	GlassBreak(0);
+	SetLineTexture(line_id,SIDE_FRONT,TEXTURE_MIDDLE,"MIRR_W04");
+}
+
+script 407 OPEN	
+{	//Water Waggle & Plane Reflection
+	Ceiling_Waggle(30,32,16,0,0);
+	Sector_SetPlaneReflection(128,20,0);
+}
+
+script 408 (int light_tid)	
+{	//Generic Light Script
+	if(!GetActorProperty(light_tid,APROP_Dormant))
+		Thing_Deactivate(light_tid);
+	else
+		Thing_Activate(light_tid);
+	PlaySound(0,"SW_LIGHT");
+}
+
+script 409 (void)	
+{	//Generic Ladder Script
+	ThrustThingZ(0, 15, 0, 0);
+	ACS_NamedExecute("Laddersound", 0, 0, 0, 0);
+}
+
+script "Laddersound" (void)
+{
+	PlaySound (0, "world/ladder", CHAN_BODY, 0.71);
+	delay(15);
+}
+
+Script 501 (int supplychestid)	
+{	//Supply Chest Script with Grenades
+	ACS_NamedExecuteAlways("SupplyChest",0,supplychestid,6);//Grenades
+}
+
+Script 502 (int supplychestid)	
+{	//Supply Chest Script  with Coins
+	if(CheckInventory("ChestKey">=1))
+	{
+		acs_execute(204,0,0,0,0);
+	}
+	ACS_NamedExecuteAlways("SupplyChest",0,supplychestid,1);//100 Coins
+}

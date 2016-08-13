@@ -1,0 +1,35 @@
+#include "zcommon.acs"
+
+//mxd. Generic lightning storm
+script "LightningLoop" (int tag, int minradius, int maxradius)
+{
+    int x = GetActorX(tag);
+    int y = GetActorY(tag);
+    int z = GetActorZ(tag);
+    int diff = (maxradius - minradius) / 2;
+
+    while(true)
+    {
+        int dist = Random(minradius, maxradius);
+        int angle = Random(0, 255) << 8;
+        int vol = (dist - minradius) * 64 / diff;
+
+        Spawn("LightningBolt", x + FixedMul(sin(angle), (dist << 16)), y + FixedMul(cos(angle), (dist << 16)), z);
+
+        Delay(Random(20, 100));
+        AmbientSound("misc/thunder", 64 + vol);
+
+        Delay(Random(350, 1400)); // Repeat every 10 - 20 seconds
+    }
+}
+
+//////////////////////////////////////
+////////// Briefing Scripts //////////
+//////////////////////////////////////
+
+script 20 OPEN
+{
+  //mxd. Start the lighning storm
+  Delay(3*35);
+  ACS_NamedExecute("LightningLoop", 0, 97, 64, 128);
+}
