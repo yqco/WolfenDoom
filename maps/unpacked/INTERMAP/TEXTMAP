@@ -23515,6 +23515,7 @@ class5 = true;
 
 thing // 938
 {
+id = 112;
 x = -3148.000;
 y = 548.000;
 angle = 61;
@@ -23539,6 +23540,7 @@ class5 = true;
 
 thing // 939
 {
+id = 112;
 x = -3148.000;
 y = 492.000;
 angle = 61;
@@ -23563,6 +23565,7 @@ class5 = true;
 
 thing // 940
 {
+id = 112;
 x = -3148.000;
 y = 520.000;
 angle = 61;
@@ -23743,7 +23746,7 @@ class5 = true;
 
 thing // 947
 {
-id = 112;
+id = 114;
 x = -3152.000;
 y = 856.000;
 angle = 270;
@@ -79088,6 +79091,7 @@ v1 = 2388;
 v2 = 2377;
 sidefront = 5162;
 sideback = 5163;
+id = 115;
 special = 80;
 arg0 = 811;
 twosided = true;
@@ -79499,6 +79503,7 @@ v1 = 2436;
 v2 = 2437;
 sidefront = 5250;
 sideback = 5251;
+id = 113;
 special = 80;
 arg0 = 810;
 twosided = true;
@@ -84000,8 +84005,13 @@ v1 = 2810;
 v2 = 2811;
 sidefront = 6058;
 sideback = 6059;
+special = 80;
+arg0 = 821;
 twosided = true;
 blocksound = true;
+repeatspecial = true;
+playercross = true;
+firstsideonly = true;
 }
 
 linedef // 3456
@@ -84051,8 +84061,14 @@ v1 = 2816;
 v2 = 2818;
 sidefront = 6068;
 sideback = 6069;
+special = 80;
+arg0 = 821;
+arg2 = 1;
 twosided = true;
 blocksound = true;
+repeatspecial = true;
+playercross = true;
+firstsideonly = true;
 }
 
 linedef // 3461
@@ -85304,13 +85320,9 @@ v1 = 2809;
 v2 = 2914;
 sidefront = 6308;
 sideback = 6309;
-special = 80;
-arg0 = 821;
 twosided = true;
 dontpegtop = true;
 blocksound = true;
-repeatspecial = true;
-playercross = true;
 }
 
 linedef // 3583
@@ -85379,13 +85391,8 @@ v1 = 2917;
 v2 = 2790;
 sidefront = 6322;
 sideback = 6323;
-special = 80;
-arg0 = 821;
-arg2 = 1;
 twosided = true;
 blocksound = true;
-repeatspecial = true;
-playercross = true;
 }
 
 linedef // 3590
@@ -86428,8 +86435,14 @@ v1 = 2773;
 v2 = 3017;
 sidefront = 6518;
 sideback = 6519;
+special = 80;
+arg0 = 821;
+arg2 = 1;
 twosided = true;
 blocksound = true;
+repeatspecial = true;
+playercross = true;
+firstsideonly = true;
 }
 
 linedef // 3692
@@ -86438,9 +86451,13 @@ v1 = 3015;
 v2 = 2774;
 sidefront = 6520;
 sideback = 6521;
+special = 80;
+arg0 = 809;
 twosided = true;
 blocksound = true;
 zoneboundary = true;
+playercross = true;
+firstsideonly = true;
 }
 
 linedef // 3693
@@ -86470,10 +86487,12 @@ v2 = 2775;
 sidefront = 6526;
 sideback = 6527;
 special = 80;
-arg0 = 809;
+arg0 = 821;
 twosided = true;
 blocksound = true;
+repeatspecial = true;
 playercross = true;
+firstsideonly = true;
 }
 
 linedef // 3696
@@ -86591,13 +86610,9 @@ v1 = 2804;
 v2 = 2772;
 sidefront = 6544;
 sideback = 6545;
-special = 80;
-arg0 = 821;
 twosided = true;
 dontpegtop = true;
 blocksound = true;
-playercross = true;
-firstsideonly = true;
 }
 
 linedef // 3707

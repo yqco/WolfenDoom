@@ -1,14 +1,14 @@
 #include "zcommon.acs"
 
+#define GRENADE_FROM_CACHE_TID 5000
+#define ROCKET_FROM_CACHE_TID 5001
+
 global int 6:mission_number;		//The variable for the mission number
 int briefing_seen;		//The variable that checks if the briefing has been watched or not
 int daytime_intermap;	//The variable for the daytime
 int briefing_in_progress; //mxd. Stops Miller's idle chatter when showing a briefing
 //Secret mission variables
 int eisenmann_akten,eisenmann_active,astrostein_artifact,astrostein_active;
-
-// Talon1024 - Allow player to retain grenades he had before starting the training course. (If he bought some from the shop)
-int num_grenades[4]; // Array because co-op players.
 
 //The Intermap loads for the first time, set up everything
 script "OPEN INTERMAP" OPEN
@@ -37,7 +37,8 @@ script "OPEN INTERMAP" OPEN
 	// Make training weapons undroppable
 	GiveActorInventory(110, "MakeUndroppable", 1); // walther
 	GiveActorInventory(111, "MakeUndroppable", 1); // karabiner98k
-	GiveActorInventory(112, "MakeUndroppable", 1); // panzerschreck
+	GiveActorInventory(112, "MakeUndroppable", 1); // karabiner98k
+	GiveActorInventory(114, "MakeUndroppable", 1); // panzerschreck
 
 	daytime_intermap=1;
 	delay(35*2);
@@ -50,6 +51,9 @@ script "ENTER INTERMAP" ENTER
 	ACS_NamedExecute("CLEAR INVENTORY", 0);
 	TakeInventory("MineSweeper", 1);
 	GiveInventory("HQ_Checker", 1);
+
+	// Players are invulnerable while at HQ
+	SetPlayerProperty(0, ON, PROP_BUDDHA);
 }
 
 //The Player returns to the Intermap after his missions
@@ -58,6 +62,9 @@ script "RETURN INTERMAP" RETURN
 	FadeRange (0,0,0,1.0,0,0,0,0.0,2.5);
 	GiveInventory("HQ_Checker", 1);
 	daytime_intermap++; //change the Daytime
+
+	// Players are invulnerable while at HQ
+	SetPlayerProperty(0, ON, PROP_BUDDHA);
 
 	if(daytime_intermap==1)
 	{
@@ -666,19 +673,16 @@ script 5 (void)
 	if(eisenmann_active)
 	{
 		eisenmann_active=0;
-		TakeInventory("HQ_Checker",1); //re-enable usability for Grenades - Ozy
 		Teleport_NewMap(101,0,0); //Let's go to the secret mission
 	}
 	else if(astrostein_active)
 	{
 		astrostein_active=0;
-		TakeInventory("HQ_Checker",1); //re-enable usability for Grenades - Ozy
 		Teleport_NewMap(201,0,0); //Let's go to the secret mission
 	}
 	else
 	{
 		mission_number++;		//and set the next mission
-		TakeInventory("HQ_Checker",1); //re-enable usability for Grenades - Ozy
 		Teleport_NewMap(mission_number,0,0); //Let's go to the next mission
 	}
 }
@@ -799,7 +803,7 @@ script 155 (int jukeboxnr)
 //// General Map Scripts //////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////
 
-script "RemoveSupplyChest" UNLOADING
+script "OnLeaveMap" UNLOADING
 {
 	// Remove the supply chest if has been opened and collected.
 	int chest_tid = 39;
@@ -808,6 +812,12 @@ script "RemoveSupplyChest" UNLOADING
 	{
 		Thing_Remove(chest_tid);
 	}
+
+	// Disable Buddha for all players
+	SetPlayerProperty(1, OFF, PROP_BUDDHA);
+
+	// Clear inventory and return non-training grenades for all players
+	GiveInventory("PlayerLeavingHQ", 1);
 }
 
 //Generic Flush Sound WC
@@ -862,15 +872,37 @@ script 801 (void)
 		hudmessage(s:"A";
 		HUDMSG_FADEINOUT,990,CR_UNTRANSLATED,400.0,115.1,1.0,0.5,0.5);
 	}
-	if(training_hit==2)
+	else if(training_hit==2)
 	{
 		sethudsize(800,600,1);
 		setfont("OBJIC23");
 		hudmessage(s:"A";
 		HUDMSG_FADEINOUT,990,CR_UNTRANSLATED,400.0,115.1,1.0,0.5,0.5);
 	}
-	if(training_hit==3)
+	else if(training_hit==3)
 	{
+		// Ensure weapons are removed to counteract weapon stay in multiplayer
+		switch (training_lesson)
+		{
+		case 1:
+			Thing_Remove(110); // Remove walther pickup
+			break;
+
+		case 2:
+			Thing_Remove(111); // Remove karabiner98k pickup
+			break;
+
+		case 3:
+			Thing_Remove(112); // Remove grenade pickups
+			SetLineSpecial(113, 0);	// Disable grenade cache
+			break;
+
+		case 4:
+			Thing_Remove(114); // Remove panzerschreck pickup
+			SetLineSpecial(115, 0); // Disable rocket cache
+			break;
+		}
+
 		training_hit=0;				  	//Set the hits to 0 again
 		acs_execute(820, 0, 0, 0, 0); 	//Lower the lesson-depending gate
 		delay(1);
@@ -878,7 +910,7 @@ script 801 (void)
 		ACS_NamedExecuteAlways("boaobjectiveaccomplished",0,0,0,0); //Objective accomplished
 		delay(35);
 		ACS_NamedExecute("CLEAR INVENTORY", 0);	//Clear the Inventory
-		ACS_NamedExecute("NOGRENADES", 0); //Clear grenades from the Tutorial - Ozy
+		GiveInventory("ConfiscateTrainingGrenades", 1); //Clear grenades from the Tutorial - Ozy
 	}
 }
 //all delays augmented by 2 in order to avoid conflicts between dialogues and briefings - Ozy
@@ -890,12 +922,10 @@ script 803 (void) //First briefing of Darren in the training room
 		thing_remove(81);
 		delay(7*35);
 		floor_lowerbyvalue(109, 10, 128); //lower this gate only if the player interact with Darren - Ozy
-		num_grenades[PlayerNumber()] = CheckInventory("GrenadePickup"); // Talon1024
 }
 
 script 804 (void) //First lesson intro
 {
-		num_grenades[PlayerNumber()] = CheckInventory("GrenadePickup"); // Talon1024
 		ACS_NamedExecuteAlways("BoADialogue",0,"MS_DARR1","MS_DARR0","DARRENTRAINING02");
 		delay(7*35);
 		floor_lowerbyvalue(90, 10, 128); //lower this gate after 7 secs in order to avoid messy messages :P - Ozy
@@ -911,7 +941,6 @@ script 805 (void) //Second lesson intro
 script 806 (void) //Third lesson intro
 {
 		ACS_NamedExecuteAlways("BoADialogue",0,"MS_DARR1","MS_DARR0","DARRENTRAINING05");
-		TakeInventory("HQ_Checker",1); //enable the possibility to throw grenades - ozy81
 		delay(7*35);
 		floor_lowerbyvalue(92, 10, 128);
 }
@@ -944,25 +973,45 @@ script 809 (void) //Done
 		{
 				ACS_NamedExecuteAlways("BoADialogue",0,"MS_DARR1","MS_DARR0","DARRENTRAINING09");
 		}
-
-		// Talon1024 - grenade fix
-		if (CheckInventory("GrenadePickup") < num_grenades[PlayerNumber()]) {
-			GiveInventory("GrenadePickup", num_grenades[PlayerNumber()] - CheckInventory("GrenadePickup"));
-		} else if (CheckInventory("GrenadePickup") > num_grenades[PlayerNumber()]) {
-			GiveInventory("GrenadePickup", CheckInventory("GrenadePickup") - num_grenades[PlayerNumber()]);
-		}
 		
-		GiveInventory("HQ_Checker",1); //disable grenades on HQs
 		floor_raisebyvalue(109, 10, 128); //raise this gate in order to block the passage to training place - Ozy
 		delay(20*35);
 		thing_remove(65);
+}
+
+// Spawn a physical item for the player to pickup. This has the perks of regular
+// item grabbing: the screen flashes, a sound plays, and a message is displayed.
+// Ammo should not be made undroppable because the flag will bind permanently.
+function void SpawnCacheItem(int tid, str class, int undroppable)
+{
+	if(!IsTIDUsed(tid))
+	{
+		// Spawn the item
+		int x = GetActorX(0);
+		int y = GetActorY(0);
+		int z = GetActorZ(0);
+		SpawnForced(class, x, y, z, tid);
+
+		// Make it undroppable
+		if (undroppable)
+		{
+			GiveActorInventory(tid, "MakeUndroppable", 1);
+		}
+	}
+	else
+	{
+		Warp(tid, 0, 0, 0, 0, WARPF_NOCHECKPOSITION | WARPF_MOVEPTR);
+	}
+
+	// Players must be moving in order to pickup items
+	SetActorVelocity(0, Random(-0.02, 0.02), Random(-0.02, 0.02), 0.0, true, false);
 }
 
 script 810 (void) //Give Grenade
 {
 	if(CheckInventory("GrenadePickup")<3)
 	{
-		GiveInventory("GrenadePickup", 1);
+		SpawnCacheItem(GRENADE_FROM_CACHE_TID, "GrenadePickup", true);
 	}
 }
 
@@ -970,7 +1019,7 @@ script 811 (void) //Give Rocket - ozy81
 {
 	if(CheckInventory("PanzerAmmo")<4)
 	{
-		GiveInventory("PanzerAmmo", 1);
+		SpawnCacheItem(ROCKET_FROM_CACHE_TID, "PanzerAmmo", false);
 	}
 }
 
@@ -979,16 +1028,32 @@ script 820 (void)
 	floor_lowerbyvalue(300+training_lesson, 20, 128);
 }
 
-
-script 821 (int buddha_activate)
+// Called by the player when they enter/leave the training area
+script 821 (int training_area)
 {
-	if(buddha_activate==1)	
+	int grenade_count;
+	if(training_area==1)
 	{
-		SetPlayerProperty(0, 1, PROP_BUDDHA);
+		// Replace player's found/bought grenades with tokens
+		grenade_count = CheckInventory("GrenadePickup");
+		TakeInventory("GrenadePickup", grenade_count);
+		GiveInventory("NonTrainingGrenade", grenade_count);
+
+		// Allow player to throw grenades
+		TakeInventory("HQ_Checker", 1);
 	}
 	else
 	{
-		SetPlayerProperty(0, 0, PROP_BUDDHA);
+		// Remove training grenades
+		TakeInventory("GrenadePickup", 0x7FFFFFFF);
+
+		// Convert tokens back into real grenades
+		grenade_count = CheckInventory("NonTrainingGrenade");
+		TakeInventory("NonTrainingGrenade", grenade_count);
+		GiveInventory("GrenadePickup", grenade_count);
+
+		// Disallow player to throw grenades
+		GiveInventory("HQ_Checker", 1);
 	}
 }
 
