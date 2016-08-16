@@ -70,9 +70,10 @@ script "Armory" ENTER
         GiveInventory("Browning5",1);
         GiveInventory("12GaugeAmmo",16);
         GiveInventory("Luger9mm",1);
-        GiveInventory("9mmAmmo",24);
+        GiveInventory("9mmAmmo",48); //augmented from 24 to 48 - ozy81
         GiveInventory("KnifeSilent",1);
         GiveInventory("Kar98k", 1);
+        GiveInventory("MP40", 1); //as suggested by Talon for the UberMutant battle - ozy81
         GiveInventory("C4", 3);
         SetWeapon("Browning5");
 }
