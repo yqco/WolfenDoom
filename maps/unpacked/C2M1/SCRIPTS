@@ -114,7 +114,7 @@ script 1 ENTER
     ACS_NamedExecute("CLEAR INVENTORY", 0);
 
     //mxd. Stealth system usage
-    VisibilityMultiplier = 0.4; // Make the player less visible
+    VisibilityMultiplier = 0.35; // Make the player less visible
     //NoiseLevelMultiplier = 0.9; // And slightly less hearable
     //ShowStealthHUD = true; // Show the HUD
     //PlayerDetectionVisibility = 100;
@@ -159,6 +159,7 @@ script 5 (void) //Alarm execute
     thing_activate(127);
 	SpawnSpotFacingForced("SSGuard", 142, 0);
 	SpawnSpotFacingForced("GermanShepherd", 143, 0);
+	SetMusic("HURRY");
 }
 
 script 6 (void) //first time outside message
@@ -185,7 +186,39 @@ script 8 (void) //final message before reaching Darren
     ACS_NamedExecuteAlways("BoADialogue",0,"MS_DARR1","MS_DARR0","DARRENMESSAGE48");
 }
 
+script 9 (void) //spawn ss after blue key
+{
+	SpawnSpotFacingForced("Doberman", 171, 0);
+	SpawnSpotFacingForced("SSGuard", 172, 0);
+}
 
+script 10 (void) //spawn ss after cyan key
+{
+	SpawnSpotFacingForced("Doberman", 173, 0);
+}
+
+script 11 (void) //spawn ss after greenkey
+{
+	SpawnSpotFacingForced("Doberman", 174, 0);
+}
+
+script 12 (void)
+{
+	SetHudSize(640, 480, true);
+	hudmessagebold(l: "HINTTEXTC2M1B"; HUDMSG_FADEINOUT,80,CR_GRAY,320.0,470.0,3.0,1.0,1.0);
+	TakeInventory("9mmAmmo", 999);
+}
+
+script 13 (void)
+{
+	SetHudSize(640, 480, true);
+	hudmessagebold(l: "HINTTEXTC2M1C"; HUDMSG_FADEINOUT,80,CR_GRAY,320.0,470.0,3.0,1.0,1.0);
+}
+
+script 14 (int dobersource) //spawn doberman at fleeing
+{
+	SpawnSpotFacingForced("Doberman", dobersource, 0);
+}
 
 //////////////////////////////////////
 ////// Generic Effect Scripts ////////
