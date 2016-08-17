@@ -1,5 +1,10 @@
 #include "zcommon.acs"
 
+// Symbolic names for fixed-point angles
+#define FIXED_45_DEGREES 0.125
+#define FIXED_10_DEGREES 0.027776
+#define FIXED_5_DEGREES 0.013888
+
 script "OBJECTIVES" OPEN
 {
 	//Set primary objectives
@@ -404,126 +409,302 @@ script 987 OPEN
 // Is the ride sequence active?
 bool truckSequenceActive;
 
+// When true, the mine cart adjusts its pitch to match the track.
+bool pitchFromTrack;
+
+// Bitmask of passenger slots that are available (0 = empty, 1 = occupied)
+// This is used to reposition passengers if one dies or disconnects
+int passengerSlots;
+
+// Number of players riding the cart
+int passengerCount;
+
+#define CART_VIEW_CHANGE 20.0
+
 // This script should be activated by the player, where the railMover is the "Path Follower" and the truck the "Model"
 Script "TruckSequence" (int railMover, int truck)
 {
-   // Exclamation mark deactivate
-   Thing_Deactivate(132);
-   
-   // Store viewheight and set a new one according to the ride
-   int oldViewHeight = GetActorProperty(0, APROP_ViewHeight);
-   SetActorProperty(0, APROP_ViewHeight, oldViewHeight - 20.0);
-   
-   // Ensure player has a tid
-   if (!ActivatorTID())
-	  Thing_ChangeTID(0, UniqueTID(-32768, 0));
-   int player = ActivatorTID();
-   
-   // Force player to use a certain weapon on the ride
-   //str weap = GetWeapon();
-   //GiveInventory("NoWeapon", 1);
-   //SetWeapon("NoWeapon");
-   
-   // Is the ride sequence already active on another player?
-   bool extraPlayer = false;
-   
-   //Rough speed of the cart; used to play speed-based sounds
-   int cartSpeed = 0;
-   
-   // Activate the railMover
-   if (!truckSequenceActive)
-   {
-	  Thing_Activate(railMover);
-	  truckSequenceActive = true;
-	  
-	  // Start playing the movement sound
-	  PlaySound(truck, "CARTROLL", CHAN_BODY, 1.0, true);
-   }
-   else // If sequence is already active, this is an extra player
-	  extraPlayer = true;
-   
-   // Variables
-   int tox, toy;         // Truck x and y offsets, to eliminate most possible jitters
-   int ota, ta, otp, tp; // Old truck angle, truck angle, old truck pitch, truck pitch
-   int pa, pp;           // Player angle, player pitch, explanation below
-   
-   while (truckSequenceActive)
-   {
-	  // Move ride along rail
-	  if (!extraPlayer)
-	  {
-		 SetActivator(truck);
-		 tox = GetActorVelX(railMover) - GetActorVelX(0);
-		 toy = GetActorVelY(railMover) - GetActorVelY(0);
-		 ota = GetActorAngle(0);
-		 otp = GetActorPitch(0);
-		 Warp(railMover, tox, toy, 0, 0, WARPF_ABSOLUTEOFFSET|WARPF_INTERPOLATE|WARPF_STOP|WARPF_NOCHECKPOSITION);
-		 ChangeActorPitch(0, (1.0 - GetActorPitch(railMover)), true);
-		 ta  = GetActorAngle(0);
-		 tp  = GetActorPitch(0);
-		 
-		 If (tp < 0) { cartSpeed += 1; }
-		 Else If (tp > 0) { cartSpeed -= 1; }
-		 
-		 PlaySound(truck, StrParam(s:"CARTROL", d:cartspeed / 100), CHAN_BODY, 1.0, true);
-	 	 		  
-		  // Tilt the ride on turns, angle based on how quickly it is turning
-		 int rollAmt = (ta - ota) / 3;
-		 If (abs(rollAmt) < 500)
-		 {
-			ChangeActorRoll(0, rollAmt, TRUE);
-			If (abs(rollAmt) > 200 || cartSpeed > 400) PlaySound(truck, "CARTSQUE", CHAN_7, 1.0, FALSE);
-		 }
-	  }
-   
-	  // Move player along rail
-	  // Get player angle so we can restore it after the warp
-	  // We do this instead of using WARPF_USECALLERANGLE so that
-	  // the offsets don't get messed up when the truck rotates.
-	  SetActivator(player);
-	  pa = GetActorAngle(0);
-	  pp = GetActorPitch(0);
-	  Warp(truck, -10.0 + (GetActorPitch(railMover) * 300), 0, 30.0, 0, WARPF_COPYINTERPOLATION|WARPF_STOP|WARPF_NOCHECKPOSITION);
-	  // variant 1 for making the player dependent from ride movement...
-	  //ChangeActorAngle(0, pa + (ta - ota), true);
-	  //ChangeActorPitch(0, pp - (tp - otp) * 3 / 5, true);
-	  
-	  // ...or variant 2 for making the player independent from ride movement
-	  ChangeActorAngle(0, pa, true);
-	  
-	  // Reduce player velocity to 0 (prevents movement bobbing during entire ride)
-	  SetActorVelocity(0, 0, 0, 0, false, true);
-	  
-	  Delay(1);
-   }
-   
-   // Stop rail and sound, then play stop sound if this was the orignal activator of the sequence
-   if (!extraPlayer)
-   {
-	  StopSound(truck, CHAN_BODY);
-	  Thing_Deactivate(railMover);
-	  PlaySound(truck, "CARTSTOP");
-   }
-   
-   // Get player out of the ride
-   SetActivator(player);
-   
-   // Define the position where each player exits
-   switch (PlayerNumber())
-   {
-	  default:
-	  case 0: Warp(truck, 64.0, 0.0, 30.0, 0, WARPF_COPYINTERPOLATION|WARPF_STOP|WARPF_NOCHECKPOSITION); break;
-	  case 1: Warp(truck, 64.0, 0.0, 30.0, 0, WARPF_COPYINTERPOLATION|WARPF_STOP|WARPF_NOCHECKPOSITION); break;
-	  case 2: Warp(truck, 64.0, 0.0, 30.0, 0, WARPF_COPYINTERPOLATION|WARPF_STOP|WARPF_NOCHECKPOSITION); break;
-	  case 3: Warp(truck, 64.0, 0.0, 30.0, 0, WARPF_COPYINTERPOLATION|WARPF_STOP|WARPF_NOCHECKPOSITION); break;
-   }
-   
-   // Restore the viewheight
-   SetActorProperty(0, APROP_ViewHeight, oldViewHeight);
-   
-   // Give player their weapon back
-   //SetWeapon(weap);
-   //TakeInventory("NoWeapon", 1);
+	// TID of object used to measure track height around cart
+	int measurerTid = 0;
+
+	// Start the main script instance. This instance will run even if the starting player
+	// dies or disconnects.
+	if (!truckSequenceActive)
+	{
+		truckSequenceActive = true;
+		pitchFromTrack = true;
+		passengerSlots = 0;
+		passengerCount = 0;
+
+		// Start the path follower
+		Thing_Activate(railMover);
+
+		// Exclamation mark deactivate
+		Thing_Deactivate(132);
+
+		// Start playing the movement sound
+		PlaySound(truck, "CARTROLL", CHAN_BODY, 1.0, true);
+
+		// Create a dummy actor to measure the track height with
+		measurerTid = UniqueTID();
+		SpawnForced("MapSpot", 0, 0, 0, measurerTid);
+	}
+
+	// Set maximum passenger count
+	if (passengerCount >= 4)
+	{
+		terminate;
+	}
+	++passengerCount;
+
+	// Find a free passenger slot
+	int passengerIndex = 0;
+	while (passengerSlots & (1 << passengerIndex))
+	{
+		++passengerIndex;
+	}
+
+	// Mark slot as occupied
+	passengerSlots |= (1 << passengerIndex);
+
+	// Store view and attack height and set a new one according to the ride
+	int oldViewHeight = GetActorProperty(0, APROP_ViewHeight);
+	int oldAttackOffset = GetActorProperty(0, APROP_AttackZOffset);
+	SetActorProperty(0, APROP_ViewHeight, oldViewHeight - CART_VIEW_CHANGE);
+	SetActorProperty(0, APROP_AttackZOffset, oldAttackOffset - CART_VIEW_CHANGE);
+
+	// Ensure player has a tid
+	if (!ActivatorTID())
+		Thing_ChangeTID(0, UniqueTID(-32768, 0));
+	int playerTid = ActivatorTID();
+	int playerNum = PlayerNumber();
+
+	// Force player to use a certain weapon on the ride
+	//str weap = GetWeapon();
+	//GiveInventory("NoWeapon", 1);
+	//SetWeapon("NoWeapon");
+
+	// Variables
+	int tox, toy;         // Truck x and y offsets, to eliminate most possible jitters
+	int ota, ta, otp, tp; // Old truck angle, truck angle, old truck pitch, truck pitch
+	int pa, pp;           // Player angle, player pitch, explanation below
+	ota = GetActorAngle(0); ta = ota;
+	otp = GetActorPitch(0); tp = otp;
+
+	// Old cart positions (used to calculate cart's speed)
+	int otx = GetActorX(truck);
+	int oty = GetActorY(truck);
+	int otz = GetActorZ(truck);
+
+	//Rough speed of the cart; used to play speed-based sounds
+	int cartSpeed = 0;
+	int cartRadius = GetActorProperty(truck, APROP_Radius);
+
+	// Offset of player from floor when riding in cart
+	int distFromFloor = 30.0;
+
+	// True if the passenger hasn't been killed
+	bool stillAlive = true;
+
+	while (truckSequenceActive)
+	{
+		// Check if player has been killed or disconnected
+		if (stillAlive)
+		{
+			if (!PlayerInGame(playerNum) || GetActorProperty(playerTid, APROP_Health) <= 0)
+			{
+				// Player died or disconnected, mark passenger slot as empty
+				passengerSlots &= ~(1 << passengerIndex);
+				--passengerCount;
+				stillAlive = false;
+
+				// If this isn't the first instance of this script it can be terminated
+				if (!measurerTid)
+				{
+					terminate;
+				}
+			}
+		}
+
+		SetActivator(truck);
+		tox = GetActorVelX(railMover) - GetActorVelX(0);
+		toy = GetActorVelY(railMover) - GetActorVelY(0);
+
+		// Move ride along rail
+		if (measurerTid)
+		{
+			ota = GetActorAngle(0);
+			otp = GetActorPitch(0);
+			Warp(railMover, tox, toy, 0.0, 0, WARPF_ABSOLUTEOFFSET|WARPF_INTERPOLATE|WARPF_STOP|WARPF_NOCHECKPOSITION|WARPF_TOFLOOR);
+
+			// Match slope of the track
+			if (pitchFromTrack)
+			{
+				tp = CalculateTrackSlope(measurerTid, cartRadius);
+				ChangeActorPitch(0, tp, true);
+				otp = tp;
+			}
+			else
+			{
+				// Use the pitch from the interpolation points
+				otp = tp;
+				ChangeActorPitch(0, (1.0 - GetActorPitch(railMover)), true);
+				tp = GetActorPitch(0);
+			}
+
+			// Calculate the cart's speed
+			int x = GetActorX(0);
+			int y = GetActorY(0);
+			int z = GetActorZ(0);
+			cartspeed = VectorLength(VectorLength(otx - x, oty - y), otz- z);
+			otx = x; oty = y; otz = z;
+
+			// Cap speed value (not actual speed) for sound and roll calculations
+			int maxSpeed = 16.0;
+			if (cartspeed > maxSpeed)
+			{
+				cartspeed = maxSpeed;
+			}
+
+			// Calculate sound to play based on cart's speed
+			int numberOfSounds = 4;
+			int cartsound = ((cartspeed + 0.5) >> 16) / numberOfSounds; // Round cartspeed to an int then divide by number of sounds to get sound index
+			if (cartsound < 0)
+			{
+				cartsound = 0;
+			}
+			else if (cartsound > numberOfSounds)
+			{
+				cartsound = numberOfSounds;
+			}
+			PlaySound(truck, StrParam(s:"CARTROL", d:cartsound), CHAN_BODY, 1.0, true);
+
+			// Calculate roll based on truck speed and turning
+			int roll = GetActorRoll(0);
+			if (roll > 0.5)
+			{
+				roll = -1.0 + roll;
+			}
+			int deltaAngle = CalculateAngleChange(truck, ta); // Get difference between current and previous angle
+			roll = FixedMul(roll, 0.75) + FixedMul(deltaAngle, FixedDiv(cartspeed, maxSpeed));
+			ta = GetActorAngle(0);
+
+			// Roll the cart on turns based on speed and how quickly it is turning
+			int maxRoll = FIXED_10_DEGREES;
+			if (abs(roll) > FIXED_5_DEGREES)
+			{
+				if (abs(roll) > maxRoll)
+				{
+					if (roll > 0) roll = maxRoll;
+					else roll = -maxRoll;
+				}
+				PlaySound(truck, "CARTSQUE", CHAN_7, 1.0, FALSE);
+			}
+			SetActorRoll(0, roll);
+		}
+
+		// Move player along rail
+		// Get player angle so we can restore it after the warp
+		// We do this instead of using WARPF_USECALLERANGLE so that
+		// the offsets don't get messed up when the truck rotates.
+		if (stillAlive && SetActivator(playerTid))
+		{
+			// Reposition passengers if one dies
+			if (passengerIndex > (passengerCount - 1))
+			{
+				// Find a free passenger slot
+				int i = 0;
+				while ((1 << i) & passengerSlots)
+				{
+					++i;
+				}
+
+				// Mark current slot as empty, mark found slot as used
+				passengerSlots ^= (1 << passengerIndex) | (1 << i);
+				passengerIndex = i;
+			}
+
+			// Adjust riding position according to pitch
+			tp = GetActorPitch(truck);
+			int sinetp = sin(tp);
+			int xOffset = -FixedMul(sinetp,  16.0);
+			int zOffset = FixedMul(sin(tp), 10.0);
+
+			pa = GetActorAngle(0);
+			pp = GetActorPitch(0);
+			Warp(railMover, tox, toy, distFromFloor, 0, WARPF_ABSOLUTEOFFSET|WARPF_INTERPOLATE|WARPF_STOP|WARPF_NOCHECKPOSITION|WARPF_TOFLOOR);
+
+			// Adjust passenger position according to passenger index and cart pitch
+			ta = GetActorAngle(truck);
+			OffsetCartPassenger(ta, passengerIndex, xOffset, zOffset);
+
+			// variant 1 for making the player dependent from ride movement...
+			//ChangeActorAngle(0, pa + (ta - ota), true);
+			//ChangeActorPitch(0, pp - (tp - otp) * 3 / 5, true);
+
+			// ...or variant 2 for making the player independent from ride movement
+			ChangeActorAngle(0, pa, true);
+
+			// Reduce player velocity to 0 (prevents movement bobbing during entire ride)
+			SetActorVelocity(0, 0, 0, 0, false, true);
+		}
+
+		// Disguise script as world activated to prevent script being killed when player disconnects
+		SetActivator(0, AAPTR_NULL);
+		Delay(1);
+	}
+
+	// Stop rail and sound, then play stop sound if this was the orignal activator of the sequence
+	if (measurerTid)
+	{
+		StopSound(truck, CHAN_BODY);
+		Thing_Deactivate(railMover);
+		PlaySound(truck, "CARTSTOP");
+
+		// Remove the now-unused track height measurer
+		Thing_Remove(measurerTid);
+	}
+
+	if (stillAlive && SetActivator(playerTid))
+	{
+		// Restore the view and attack height
+		SetActorProperty(0, APROP_ViewHeight, oldViewHeight);
+		SetActorProperty(0, APROP_AttackZOffset, oldAttackOffset);
+
+		// Define the position where each player exits
+		switch (passengerIndex)
+		{
+			default:
+			case 0: Warp(truck, 64.0, 0.0, distFromFloor, FIXED_10_DEGREES, WARPF_COPYINTERPOLATION|WARPF_STOP|WARPF_NOCHECKPOSITION); break;
+			case 1: Warp(truck, 64.0, 0.0, distFromFloor, -FIXED_10_DEGREES, WARPF_COPYINTERPOLATION|WARPF_STOP|WARPF_NOCHECKPOSITION); break;
+			case 2: Warp(truck, 64.0, 0.0, distFromFloor, FixedMul(FIXED_10_DEGREES, 2.0), WARPF_COPYINTERPOLATION|WARPF_STOP|WARPF_NOCHECKPOSITION); break;
+			case 3: Warp(truck, 64.0, 0.0, distFromFloor, FixedMul(-FIXED_10_DEGREES, 2.0), WARPF_COPYINTERPOLATION|WARPF_STOP|WARPF_NOCHECKPOSITION); break;
+		}
+
+		// Toss players away from the cart
+		int tempAngle = GetActorAngle(0);
+		int cosine = Cos(tempAngle);
+		int sine = Sin(tempAngle);
+
+		int tossSpeed = 8.0;
+		int velX = FixedMul(tossSpeed, cosine);
+		int velY = FixedMul(tossSpeed, sine);
+		SetActorVelocity(0, velX, velY, 2.0, false, false);
+
+		SetActorAngle(0, pa);
+	}
+
+	// Give player their weapon back
+	//SetWeapon(weap);
+	//TakeInventory("NoWeapon", 1);
+}
+
+// Called when the mine cart is nearing the end of its track.
+script "TruckEndRoll" (void)
+{
+	// Start using the track's interpolation points to calculate the cart's pitch.
+	// This allows the cart's back wheels to lift-off the track as it stops.
+	pitchFromTrack = false;
 }
 
 Script "EndTruckSequence" (void)
@@ -539,6 +720,152 @@ Function int abs (int x)
 {
     if (x < 0) return -x;
     return x;
+}
+
+function int min(int a, int b)
+{
+	if (a < b)
+	{
+		b = a;
+	}
+	return b;
+}
+
+function int max(int a, int b)
+{
+	if (a > b)
+	{
+		b = a;
+	}
+	return b;
+}
+
+// Calculate the change in an actor's angle as a positive or negative angle.
+function int CalculateAngleChange(int tid, int oldAngle)
+{
+	int angle = GetActorAngle(tid);
+	oldAngle %= 1.0;
+
+	// Calculate both clockwise and counter-clockwise angle change.
+	// This is necessary because a change from 0.0 (east) to 0.9 (nearly east) would
+	// be seen as a change of +0.9 but it is should be -0.1.
+	int delta1 = angle - oldAngle;
+
+	int low = min(angle, oldAngle);
+	int high = max(angle, oldAngle);
+	int delta2 = low + (1.0 - high);
+	if (delta1 > 0.0)
+	{
+		delta2 = -delta2;
+	}
+
+	// Return the smallest angle.
+	int smallest = delta1;
+	if (abs(delta2) < abs(delta1))
+	{
+		smallest = delta2;
+	}
+
+	return smallest;
+}
+
+// Measure the slope of the nearby track and return the pitch the cart should use to match it.
+function int CalculateTrackSlope(int measurerTid, int cartRadius)
+{
+	// Get height of track in front of cart
+	Warp(measurerTid, cartRadius, 0.0, 0.0, 0.0,
+		WARPF_NOCHECKPOSITION | WARPF_TOFLOOR | WARPF_MOVEPTR | WARPF_COPYINTERPOLATION);
+	int frontZ = GetActorZ(measurerTid);
+
+	// Get height of track behind cart
+	Warp(measurerTid, -cartRadius, 0.0, 0.0, 0.0,
+		WARPF_NOCHECKPOSITION | WARPF_TOFLOOR | WARPF_MOVEPTR | WARPF_COPYINTERPOLATION);
+	int backZ = GetActorZ(measurerTid);
+
+	// Calculate the track's slope, use it as the cart's pitch
+	// Essentially, when the vertical difference between the front and back of the cart
+	// matches the horiztonal distance, the cart is at 45 degrees
+	int zDiff = frontZ - backZ;
+	return FixedMul(FIXED_45_DEGREES,  FixedDiv(zDiff, FixedMul(cartRadius, 2.0)));
+}
+
+// Space players out within the mine cart. This prevents players from stacking in the cart
+// and having their views obscured.
+function void OffsetCartPassenger(int truckAngle, int passengerIndex, int xOffset, int zOffset)
+{
+	int playerOffsetX = 16.0;	// Forward offset from center of cart
+	int playerOffsetY = 8.0;	// Rightwards offset from center of cart
+
+	switch (passengerCount)
+	{
+	default:
+	case 1:
+		// Solo player gets centered in cart
+		playerOffsetX = 0.0;
+		playerOffsetY = 0.0;
+		break;
+
+	case 2:
+		// Passenger 1 front-center, passenger 2 back-center
+		playerOffsetY = 0.0;
+		if (passengerIndex == 1)
+		{
+			playerOffsetX = -playerOffsetX;
+		}
+		break;
+
+	case 3:
+		// Passenger 1 front-center, passengers 2 and 3 in back corners
+		playerOffsetX = -playerOffsetX;
+		if (passengerIndex == 0)
+		{
+			playerOffsetX = -playerOffsetX;
+			playerOffsetY = 0.0;
+		}
+		else if (passengerIndex == 1)
+		{
+			playerOffsetY = -playerOffsetY;
+		}
+		break;
+
+	case 4:
+		// Passengers 1 and 2 in front corners, passenger 3 and 4 in back corners
+		if (passengerIndex == 0)
+		{
+			playerOffsetY = -playerOffsetY;
+		}
+		else if (passengerIndex == 2)
+		{
+			playerOffsetX = -playerOffsetX;
+			playerOffsetY = -playerOffsetY;
+		}
+		else if (passengerIndex == 3)
+		{
+			playerOffsetX = -playerOffsetX;
+		}
+	}
+
+	// Adjust player's z-position according to the cart's pitch
+	// (i.e. if the front of the cart is low, players in the front should be low too)
+	if (playerOffsetX == 0.0)
+	{
+		// Player is in center of cart, cart's pitch doesn't affect player's z-offset
+		zOffset = 0.0;
+	}
+	else if (playerOffsetX < 0.0)
+	{
+		// Player is in the back of the cart, pitch has the opposite affect
+		// (i.e. if the front of the cart is low, players in the back should be higher)
+		zOffset = -zOffset;
+	}
+
+	// Offset the player from the center of the cart
+	// This is the second player warp and it is needed because the first one uses the global-axis to remove
+	// the third-person jitter from players. This warp uses the cart's local axis.
+	int playerAngle = GetActorAngle(0);
+	setActorAngle(0, truckAngle);
+	Warp(AAPTR_DEFAULT, playerOffsetX + xOffset, playerOffsetY, zOffset, 0.0, WARPF_USEPTR|WARPF_INTERPOLATE|WARPF_STOP|WARPF_NOCHECKPOSITION);
+	setActorAngle(0, playerAngle);
 }
 
 Script "CartHit" (void)
