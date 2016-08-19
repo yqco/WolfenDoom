@@ -209,7 +209,7 @@ REM     CompressionLevel [int]
 REM             Upholds the compression level of the archive file.  Range is from 0-9
 REM ================================================================================================
 :CompactProject_Execute
-START "WolfenDoom Compile: 7Zip" /B /%4 /WAIT "%ProgramDirPath%\tools\7za.exe" a -t%1 -mm=%2 -mx=%3 -x@"%ProgramDirPath%\tools\7zExcludeListDir.txt" -xr@"%ProgramDirPath%\tools\7zExcludeList.txt" "%ProgramDirPath%\..\wolf_boa.pk3" "%ProgramDirPath%\*"
+START "WolfenDoom Compile: 7Zip" /B /%4 /WAIT "%ProgramDirPath%tools\7za.exe" a -t%1 -mm=%2 -mx=%3 -x@"%ProgramDirPath%tools\7zExcludeListDir.txt" -xr@"%ProgramDirPath%tools\7zExcludeList.txt" "%ProgramDirPath%..\wolf_boa.pk3" "%ProgramDirPath%*"
 REM Because I couldn't use the error-pipes with 'Start', we'll have to check the ExitCode in a conditional statement
 IF %ERRORLEVEL% GEQ 1 (
     CALL :CompactProject_Execute_ErrMSG %ERRORLEVEL%
