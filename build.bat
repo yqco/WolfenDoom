@@ -209,8 +209,40 @@ REM     CompressionLevel [int]
 REM             Upholds the compression level of the archive file.  Range is from 0-9
 REM ================================================================================================
 :CompactProject_Execute
-"%ProgramDirPath%\tools\7za.exe" a -t%1 -mm=%2 -mx=%3 -x@"%ProgramDirPath%\tools\7zExcludeListDir.txt" -xr@"%ProgramDirPath%\tools\7zExcludeList.txt" "%ProgramDirPath%\..\wolf_boa.pk3" "%ProgramDirPath%\*"
-EXIT /B 0
+START "WolfenDoom Compile: 7Zip" /B /%4 /WAIT "%ProgramDirPath%\tools\7za.exe" a -t%1 -mm=%2 -mx=%3 -x@"%ProgramDirPath%\tools\7zExcludeListDir.txt" -xr@"%ProgramDirPath%\tools\7zExcludeList.txt" "%ProgramDirPath%\..\wolf_boa.pk3" "%ProgramDirPath%\*"
+REM Because I couldn't use the error-pipes with 'Start', we'll have to check the ExitCode in a conditional statement
+IF %ERRORLEVEL% GEQ 1 (
+    CALL :CompactProject_Execute_ErrMSG %ERRORLEVEL%
+    EXIT /B 1
+) ELSE (
+    EXIT /B 0
+)
+
+
+
+
+REM ================================================================================================
+REM Documentation
+REM     If 7Zip returned an error, let the user know that the process was terminated prematurely or failed.
+REM Parameters
+REM     ExitCode [Int] = %1
+REM             Holds the value of the ExitCode from 7Zip
+REM ================================================================================================
+:CompactProject_Execute_ErrMSG
+ECHO.
+ECHO CRITICAL ERROR: 7ZIP FAILED!
+ECHO 7Zip was unable to complete the operation and closed with an Exit Code: %1.
+ECHO.
+ECHO Tips:
+ECHO  * Make sure you have enough permission to run applications.
+ECHO  * Does the project file already exist?  If so, please delete it and try again.
+ECHO  * Make sure that the system has enough memory to perform the operation.
+ECHO  * Make sure that the files are not locked by other applications.
+ECHO  * Examine any warning messages provided and try to address them as much as possible.
+ECHO.
+ECHO If this issue reoccurs please let us know.
+PAUSE
+GOTO :EOF
 
 
 
