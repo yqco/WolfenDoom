@@ -9,6 +9,12 @@ script 2 (void) //Stop fan
 	Radius_Quake(2, 10, 0, 128, 20);
 }
 
+script 104 OPEN //First message
+{
+	delay(70);
+	ACS_NamedExecuteAlways("BoADialogue",0,"MS_OFFC1","MS_OFFC0","MARINEAFTERDOUGLESCONV03");
+}
+
 //////////////////////////////////////
 ////// Generic Effect Scripts ////////
 //////////////////////////////////////

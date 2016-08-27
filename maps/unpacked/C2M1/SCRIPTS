@@ -222,6 +222,13 @@ script 14 (int dobersource) //spawn doberman at fleeing
 	SpawnSpotFacingForced("Doberman", dobersource, 0);
 }
 
+script 15 (void)
+{
+	SetHudSize(640, 480, true);
+	hudmessagebold(l: "HINTTEXTC2M1E"; HUDMSG_FADEINOUT,80,CR_GRAY,320.0,470.0,3.0,1.0,1.0);
+	TakeInventory("9mmAmmo", 999);
+}
+
 //////////////////////////////////////
 ////// Generic Effect Scripts ////////
 //////////////////////////////////////
