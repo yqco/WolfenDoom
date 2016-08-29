@@ -7417,7 +7417,7 @@ thing // 298
 {
 id = 110;
 x = 5184.000;
-y = 4560.000;
+y = 4587.000;
 angle = 270;
 type = 9024;
 skill1 = true;
@@ -7457,6 +7457,7 @@ single = true;
 coop = true;
 dm = true;
 friend = true;
+dormant = true;
 class1 = true;
 class2 = true;
 class3 = true;
@@ -132952,7 +132953,6 @@ v2 = 5872;
 sidefront = 12848;
 sideback = 12849;
 twosided = true;
-blockmonsters = true;
 }
 
 linedef // 6990
@@ -134222,7 +134222,6 @@ v2 = 5930;
 sidefront = 13123;
 sideback = 13124;
 twosided = true;
-blockmonsters = true;
 }
 
 linedef // 7130
@@ -161751,6 +161750,19 @@ v2 = 7801;
 sidefront = 18250;
 sideback = 18251;
 twosided = true;
+}
+
+linedef // 10142
+{
+v1 = 4123;
+v2 = 4091;
+sidefront = 18252;
+sideback = 18253;
+special = 130;
+arg0 = 111;
+twosided = true;
+playercross = true;
+firstsideonly = true;
 }
 
 sidedef // 0
@@ -217782,7 +217794,7 @@ texturemiddle = "BRIK_G01";
 
 sidedef // 9401
 {
-sector = 1009;
+sector = 2403;
 texturemiddle = "STON_G51";
 offsetx_mid = 8.000;
 }
@@ -217801,7 +217813,7 @@ sector = 2096;
 
 sidedef // 9404
 {
-sector = 1009;
+sector = 2403;
 texturemiddle = "STON_G51";
 offsetx_mid = 8.000;
 }
@@ -217984,7 +217996,7 @@ sector = 2096;
 
 sidedef // 9433
 {
-sector = 1009;
+sector = 2403;
 }
 
 sidedef // 9434
@@ -218007,7 +218019,7 @@ sector = 1396;
 
 sidedef // 9437
 {
-sector = 1009;
+sector = 2403;
 texturetop = "STON_G51";
 texturebottom = "CGWALL15";
 offsetx_mid = 56.000;
@@ -229258,7 +229270,7 @@ texturemiddle = "ROCK_B71";
 
 sidedef // 11392
 {
-sector = 1009;
+sector = 2403;
 texturetop = "STON_G51";
 texturebottom = "CGWALL15";
 }
@@ -268779,6 +268791,16 @@ scalex_mid = 2.000;
 scaley_mid = 2.000;
 }
 
+sidedef // 18252
+{
+sector = 2403;
+}
+
+sidedef // 18253
+{
+sector = 1009;
+}
+
 sector // 0
 {
 heightfloor = 256;
@@ -292499,5 +292521,14 @@ heightceiling = -832;
 texturefloor = "STON_G62";
 textureceiling = "BRIK_G01";
 lightlevel = 144;
+}
+
+sector // 2403
+{
+heightfloor = -288;
+heightceiling = -192;
+texturefloor = "STON_G51";
+textureceiling = "STON_G51";
+lightlevel = 160;
 }
 
