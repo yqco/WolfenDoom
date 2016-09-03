@@ -24,6 +24,8 @@ script "STARTMESSAGE" OPEN
 	delay(2*35);
 	SetHudSize(640, 480, true);
 	hudmessagebold(l: "HINTTEXTC2M1A"; HUDMSG_FADEINOUT,80,CR_GRAY,320.0,470.0,3.0,1.0,1.0);
+	delay(10);
+	AmbientSound("menu/change", 96);
 }
 
 script 200 (void)
@@ -176,6 +178,8 @@ script 7 (void) //wood message from Darren
 	ACS_ExecuteAlways(302,0,0,0,0);
 	delay(5*35);
 	hudmessagebold(l: "HINTTEXTC2M1D"; HUDMSG_FADEINOUT,80,CR_GRAY,320.0,470.0,3.0,1.0,1.0);
+	delay(10);
+	AmbientSound("menu/change", 96);
 }
 
 script 77 (void) //final message before reaching Darren
@@ -209,12 +213,16 @@ script 12 (void)
 	SetHudSize(640, 480, true);
 	hudmessagebold(l: "HINTTEXTC2M1B"; HUDMSG_FADEINOUT,80,CR_GRAY,320.0,470.0,3.0,1.0,1.0);
 	TakeInventory("9mmAmmo", 999);
+	delay(10);
+	AmbientSound("menu/change", 96);
 }
 
 script 13 (void)
 {
 	SetHudSize(640, 480, true);
 	hudmessagebold(l: "HINTTEXTC2M1C"; HUDMSG_FADEINOUT,80,CR_GRAY,320.0,470.0,3.0,1.0,1.0);
+	delay(10);
+	AmbientSound("menu/change", 96);
 }
 
 script 14 (int dobersource) //spawn doberman at fleeing
@@ -227,12 +235,23 @@ script 15 (void)
 	SetHudSize(640, 480, true);
 	hudmessagebold(l: "HINTTEXTC2M1E"; HUDMSG_FADEINOUT,80,CR_GRAY,320.0,470.0,3.0,1.0,1.0);
 	TakeInventory("9mmAmmo", 999);
+	delay(10);
+	AmbientSound("menu/change", 96);
+}
+
+script 16 (void)
+{
+	SetHudSize(640, 480, true);
+	hudmessagebold(l: "HINTTEXTC2M1F"; HUDMSG_FADEINOUT,80,CR_GRAY,320.0,470.0,3.0,1.0,1.0);
+	delay(10);
+	AmbientSound("menu/change", 96);
 }
 
 script 101 (void)
 {
 	thing_activate(109);
 	thing_activate(183);
+	thing_activate(192);
 	LocalAmbientSound("Nazi1/Sighted", 70);
 }
 
