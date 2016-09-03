@@ -229,6 +229,37 @@ script 15 (void)
 	TakeInventory("9mmAmmo", 999);
 }
 
+script 101 (void)
+{
+	thing_activate(109);
+	thing_activate(183);
+	LocalAmbientSound("Nazi1/Sighted", 70);
+}
+
+script 102 (void)
+{
+	thing_activate(111);
+	LocalAmbientSound("Nazi1/Sighted", 70);
+}
+
+script 103 (void)
+{
+	thing_activate(125);
+	LocalAmbientSound("Nazi1/Sighted", 70);
+}
+
+script 104 (void)
+{
+	thing_activate(191);
+	LocalAmbientSound("Nazi1/Sighted", 70);
+}
+
+script 105 (void)
+{
+	thing_activate(193);
+	LocalAmbientSound("Nazi1/Sighted", 70);
+}
+
 //////////////////////////////////////
 ////// Generic Effect Scripts ////////
 //////////////////////////////////////
