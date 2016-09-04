@@ -279,6 +279,27 @@ script 105 (void)
 	LocalAmbientSound("Nazi1/Sighted", 70);
 }
 
+script 106 (void)
+{
+	thing_activate(185);
+	LocalAmbientSound("Nazi1/Sighted", 70);
+}
+
+int dogsspawned=0;
+
+script 107 (void)
+{
+	thing_activate(185);
+	thing_activate(197);
+	if(dogsspawned==0)
+	{
+		SpawnSpotFacingForced("Doberman", 198, 0);
+		dogsspawned=1;
+	}
+	LocalAmbientSound("Nazi1/Sighted", 70);
+	delay(60*35);
+}
+
 //////////////////////////////////////
 ////// Generic Effect Scripts ////////
 //////////////////////////////////////
