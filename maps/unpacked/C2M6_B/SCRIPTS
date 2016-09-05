@@ -4,10 +4,10 @@
 script 1 ENTER
 {
     //mxd. Stealth system usage
-    VisibilityMultiplier = 0.0; // Make the player less visible
-    NoiseLevelMultiplier = 1.0; // And slightly less hearable
-    ShowStealthHUD = true; // Show the HUD
-    PlayerDetectionVisibility = 100;
+    //VisibilityMultiplier = 0.0; // Make the player less visible
+    //NoiseLevelMultiplier = 1.0; // And slightly less hearable
+    //ShowStealthHUD = true; // Show the HUD
+    //PlayerDetectionVisibility = 100;
 }
 
 script 2 (void) //Put on your fancy dress
