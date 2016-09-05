@@ -8,6 +8,7 @@ script 1 ENTER
     //NoiseLevelMultiplier = 1.0; // And slightly less hearable
     //ShowStealthHUD = true; // Show the HUD
     //PlayerDetectionVisibility = 100;
+	GiveInventory("Walt)
 }
 
 script 2 (void) //Put on your fancy dress
