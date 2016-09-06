@@ -26,6 +26,15 @@ script 102 OPEN //Skyfire
 
 }
 
+script 191 OPEN //Alarm
+{
+	delay(35*random(60,120));
+	thing_activate(183);
+	delay(16*35*random(1,3));
+	thing_deactivate(183);
+	restart;
+}
+
 int skybox_light=0;
 
 script 103 OPEN //Skybox Additive Light
