@@ -8,7 +8,6 @@ script 1 ENTER
     //NoiseLevelMultiplier = 1.0; // And slightly less hearable
     //ShowStealthHUD = true; // Show the HUD
     //PlayerDetectionVisibility = 100;
-	GiveInventory("Walt)
 }
 
 script 2 (void) //Put on your fancy dress
@@ -29,7 +28,7 @@ script "Kennkarte" (void) //Check for Kennkarte
 		}
 }
 
-script 3 OPEN
+script 3 (void) //OPEN gets solved with the dialogue system
 {
 	//Darren message incoming
 	delay(2*35);
