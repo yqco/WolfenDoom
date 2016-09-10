@@ -14,5 +14,37 @@ conversation
 		dialog = "$DARRENMESSAGE42";
 		panel = "MS_DARR1";
 		voice = "allied1/greet";
+		
+		choice
+			{
+				text = "$DARRENANSWER01";
+				nextpage = 2;
+			}
+	}
+	page //2
+	{
+		name = "$DARRENMESSAGE00";
+		dialog = "$DARRENMESSAGE43";
+		panel = "MS_DARR1";
+		voice = "DLV_NIG1";
+
+		choice
+		{
+			text = "DARRENANSWER02";
+			nextpage = 3;
+		}
+	}
+	page //3
+	{
+		name = "$DARRENMESSAGE00";
+		dialog = "$DARRENMESSAGE44";
+		panel = "MS_DARR1";
+		voice = "DLV_NIG1";
+
+		choice
+		{
+			text = "DARRENANSWER03";
+			nextpage = 1;
+		}
 	}
 }

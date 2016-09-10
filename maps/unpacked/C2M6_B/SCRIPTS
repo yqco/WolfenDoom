@@ -26,6 +26,7 @@ script "Kennkarte" (void) //Check for Kennkarte
 			SetLineBlocking(178, BLOCK_PLAYERS);
 			ACS_NamedExecuteAlways("BoADialogue",0,"MS_DARR1","MS_DARR0","DARRENMESSAGE29");
 		}
+		delay(5*35);
 }
 
 script 3 (void) //OPEN gets solved with the dialogue system
@@ -62,6 +63,8 @@ script 200 (void)
 	//Prim Objective 1 solved
 	ACS_NamedExecuteAlways("boaobjectivesset",0,0,0,"MO_ICON_ACC");	
 	ACS_NamedExecuteAlways("boaobjectiveaccomplished",0,0,0,0);
+	
+	ACS_NamedExecuteAlways("BoADialogue",0,"MS_DARR1","MS_DARR0","DARRENMESSAGE54");
 }
 
 script 201 (void)
@@ -69,6 +72,8 @@ script 201 (void)
 	//Prim Objective 2 solved
 	ACS_NamedExecuteAlways("boaobjectivesset",0,0,1,"MO_ICON_ACC");	
 	ACS_NamedExecuteAlways("boaobjectiveaccomplished",0,0,0,0);
+	
+	ACS_NamedExecuteAlways("BoADialogue",0,"MS_DARR1","MS_DARR0","DARRENMESSAGE55");
 }
 
 script 202 (void)
@@ -84,6 +89,50 @@ script 203 (void)
 	ACS_NamedExecuteAlways("boaobjectivesset",0,0,3,"MO_ICON_ACC");	
 	ACS_NamedExecuteAlways("boaobjectiveaccomplished",0,0,0,0);
 }
+
+int repairkit=0;
+
+script 204 (void)
+{
+	if(repairkit==0)
+	{
+			ACS_NamedExecuteAlways("BoADialogue",0,"MS_DARR1","MS_DARR0","DARRENMESSAGE56");
+	}
+	if(repairkit==1)
+	{
+			ACS_NamedExecuteAlways("BoADialogue",0,"MS_DARR1","MS_DARR0","DARRENMESSAGE57");
+			SetPlayerProperty(0, 1, PROP_TOTALLYFROZEN);
+			TakeInventory("RepairKit", 1);
+			repairkit=0;
+			delay(2*35);
+			thing_deactivate(255);
+			thing_activate(254);
+			SetPlayerProperty(0, 0, PROP_TOTALLYFROZEN);
+			ThingSound(254, "LightOn", 127);
+			delay(2*35);
+			door_open(30, 16, 0);
+			delay(99999*35);
+	}
+}
+
+script 205 (void)
+{
+	repairkit=1;
+	ACS_NamedExecuteAlways("BoADialogue",0,"MS_DARR1","MS_DARR0","DARRENMESSAGE58");
+}
+
+script 206 (void)
+{
+	Polyobj_Move(220, 10, 128, 64);
+	ACS_NamedExecuteAlways("BoADialogue",0,"MS_DARR1","MS_DARR0","DARRENMESSAGE59");
+}
+
+script 207 (void)
+{
+	Polyobj_Move(220, 10, 128, 64);
+	ACS_NamedExecuteAlways("BoADialogue",0,"MS_DARR1","MS_DARR0","DARRENMESSAGE60");
+}
+
 
 //////////////////////////////////////
 ////// Generic Effect Scripts ////////
@@ -113,6 +162,8 @@ script 403 OPEN { //Spark Spawner (id 42)
 
 script 404 (int vent_id) { //Generic vent breaker script
 	SetLineBlocking(vent_id,BLOCK_NOTHING);
+	SetlineTexture(vent_id, SIDE_FRONT, TEXTURE_MIDDLE, "VENT_M00");
+	SetlineTexture(vent_id, SIDE_BACK, TEXTURE_MIDDLE, "VENT_M00");
 }
 
 script 405 (int toilet_id) { //Generic Flush Sound WC

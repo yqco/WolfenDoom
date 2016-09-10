@@ -15,6 +15,12 @@ script 1 (void) //Volcano Script
     restart;
 }
 
+script "RemoveNotarget" ENTER
+{
+	TakeInventory("NullWeapon", 1);
+	SetWeapon("Luger9mm");
+}
+
 int lavacount;
 
 script 2 (int lavapos) //Double Switch
