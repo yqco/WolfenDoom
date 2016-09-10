@@ -30,7 +30,7 @@ conversation
 
 		choice
 		{
-			text = "DARRENANSWER02";
+			text = "$DARRENANSWER02";
 			nextpage = 3;
 		}
 	}
@@ -43,7 +43,7 @@ conversation
 
 		choice
 		{
-			text = "DARRENANSWER03";
+			text = "$DARRENANSWER03";
 			nextpage = 1;
 		}
 	}

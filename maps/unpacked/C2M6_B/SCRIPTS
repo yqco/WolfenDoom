@@ -102,9 +102,10 @@ script 204 (void)
 	{
 			ACS_NamedExecuteAlways("BoADialogue",0,"MS_DARR1","MS_DARR0","DARRENMESSAGE57");
 			SetPlayerProperty(0, 1, PROP_TOTALLYFROZEN);
+			delay(3*35);
 			TakeInventory("RepairKit", 1);
 			repairkit=0;
-			delay(2*35);
+			delay(1*35);
 			thing_deactivate(255);
 			thing_activate(254);
 			SetPlayerProperty(0, 0, PROP_TOTALLYFROZEN);
