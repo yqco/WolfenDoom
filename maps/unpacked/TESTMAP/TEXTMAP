@@ -22425,7 +22425,7 @@ thing // 900
 x = -320.000;
 y = 1728.000;
 angle = 270;
-type = 8000;
+type = 7997;
 skill1 = true;
 skill2 = true;
 skill3 = true;
@@ -22497,7 +22497,7 @@ thing // 903
 x = 94.000;
 y = 1950.000;
 angle = 270;
-type = 8000;
+type = 7997;
 skill1 = true;
 skill2 = true;
 skill3 = true;
@@ -22569,7 +22569,7 @@ thing // 906
 x = 350.000;
 y = 1630.000;
 angle = 270;
-type = 8000;
+type = 7997;
 skill1 = true;
 skill2 = true;
 skill3 = true;
@@ -23079,10 +23079,13 @@ class5 = true;
 
 thing // 927
 {
-x = 1600.000;
-y = 2816.000;
-angle = 135;
-type = 1;
+x = 1064.000;
+y = 3304.000;
+height = 32.000;
+angle = 323;
+pitch = 157;
+roll = 352;
+type = 32766;
 skill1 = true;
 skill2 = true;
 skill3 = true;
@@ -23534,33 +23537,6 @@ height = 32.000;
 angle = 309;
 pitch = 139;
 roll = 14;
-type = 32766;
-skill1 = true;
-skill2 = true;
-skill3 = true;
-skill4 = true;
-skill5 = true;
-skill6 = true;
-skill7 = true;
-skill8 = true;
-single = true;
-coop = true;
-dm = true;
-class1 = true;
-class2 = true;
-class3 = true;
-class4 = true;
-class5 = true;
-}
-
-thing // 945
-{
-x = 1064.000;
-y = 3304.000;
-height = 32.000;
-angle = 323;
-pitch = 157;
-roll = 352;
 type = 32766;
 skill1 = true;
 skill2 = true;
