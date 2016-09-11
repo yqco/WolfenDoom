@@ -7,6 +7,11 @@ script "INTRO" OPEN
 	ACS_NamedExecuteAlways("BoADialogue",0,"MS_DARR1","MS_DARR0","DARRENMESSAGE47");
 }
 
+script "NoTargetDeactivate" ENTER
+{
+	SetPlayerProperty(1, PROP_NOTARGET, 0);
+}
+
 script 1 (void) //Volcano Script
 {
     Radius_Quake2(54, 1, 9*35, 0, 8*128, "misc/earthquake");
