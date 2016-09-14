@@ -86451,13 +86451,9 @@ v1 = 3015;
 v2 = 2774;
 sidefront = 6520;
 sideback = 6521;
-special = 80;
-arg0 = 809;
 twosided = true;
 blocksound = true;
 zoneboundary = true;
-playercross = true;
-firstsideonly = true;
 }
 
 linedef // 3693
@@ -86610,9 +86606,13 @@ v1 = 2804;
 v2 = 2772;
 sidefront = 6544;
 sideback = 6545;
+special = 80;
+arg0 = 809;
 twosided = true;
 dontpegtop = true;
 blocksound = true;
+playercross = true;
+firstsideonly = true;
 }
 
 linedef // 3707

@@ -1,5 +1,6 @@
 #include "zcommon.acs"
 
+#define TREASURE_CHEST_TID 39
 #define GRENADE_FROM_CACHE_TID 5000
 #define ROCKET_FROM_CACHE_TID 5001
 
@@ -35,10 +36,10 @@ script "OPEN INTERMAP" OPEN
 	ACS_NamedExecute("GutenbergDialogue",0);
 	
 	// Make training weapons undroppable
-	GiveActorInventory(110, "MakeUndroppable", 1); // walther
-	GiveActorInventory(111, "MakeUndroppable", 1); // karabiner98k
-	GiveActorInventory(112, "MakeUndroppable", 1); // karabiner98k
-	GiveActorInventory(114, "MakeUndroppable", 1); // panzerschreck
+	SetActorFlag(110, "INVENTORY.UNDROPPABLE", 1); // walther
+	SetActorFlag(111, "INVENTORY.UNDROPPABLE", 1); // karabiner98k
+	SetActorFlag(112, "INVENTORY.UNDROPPABLE", 1); // karabiner98k
+	SetActorFlag(114, "INVENTORY.UNDROPPABLE", 1); // panzerschreck
 
 	daytime_intermap=1;
 	delay(35*2);
@@ -65,6 +66,13 @@ script "RETURN INTERMAP" RETURN
 
 	// Players are invulnerable while at HQ
 	SetPlayerProperty(0, ON, PROP_BUDDHA);
+
+	// Remove the supply chest if has been opened and collected.
+	if (ThingCount(T_NONE, TREASURE_CHEST_TID) == 1 &&
+		CheckActorClass(TREASURE_CHEST_TID, "EmptySupplyChest"))
+	{
+		Thing_Remove(TREASURE_CHEST_TID);
+	}
 
 	if(daytime_intermap==1)
 	{
@@ -805,14 +813,6 @@ script 155 (int jukeboxnr)
 
 script "OnLeaveMap" UNLOADING
 {
-	// Remove the supply chest if has been opened and collected.
-	int chest_tid = 39;
-	if (ThingCount(T_NONE, chest_tid) == 1 &&
-		CheckActorClass(chest_tid, "EmptySupplyChest"))
-	{
-		Thing_Remove(chest_tid);
-	}
-
 	// Disable Buddha for all players
 	SetPlayerProperty(1, OFF, PROP_BUDDHA);
 
@@ -995,7 +995,7 @@ function void SpawnCacheItem(int tid, str class, int undroppable)
 		// Make it undroppable
 		if (undroppable)
 		{
-			GiveActorInventory(tid, "MakeUndroppable", 1);
+			SetActorFlag(tid, "INVENTORY.UNDROPPABLE", TRUE);
 		}
 	}
 	else
